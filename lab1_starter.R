@@ -27,6 +27,7 @@
 library(tidyverse)
 library(haven)
 library(ggplot2)
+library(skimr)
 library(statar)
 
 ## Read data 
@@ -129,15 +130,39 @@ median_rank <- median(nlsy$kid_inc_rank, na.rm = T)
 
   # YOUR CODE:
 
+# this looks linear
+
+ggplot(nlsy, aes(x = child_education, y = kid_income)) +
+  stat_smooth(method = "lm", se = FALSE) +
+  stat_binmean(n = 20, geom = "point")
+
+# this looks more exponential than linear
+
+ggplot(nlsy, aes(x = parent_inc, y = kid_income)) +
+  stat_smooth(method = "lm", se = FALSE) +
+  stat_binmean(n = 20, geom = "point")
+
+# this looks relatively linear but not as good
+
+ggplot(nlsy, aes(x = mother_education, y = kid_income)) +
+  stat_smooth(method = "lm", se = FALSE) +
+  stat_binmean(n = 20, geom = "point")
+
+# this looks relatively linear
+
+ggplot(nlsy, aes(x = child_sat, y = kid_income)) +
+  stat_smooth(method = "lm", se = FALSE) +
+  stat_binmean(n = 20, geom = "point")
 # Which of the variables you chose seem to be non-linearly related to kid_income?
 
-  # ANSWER:
+  # ANSWER: The only variable I looked at that seemed to be non-linear is parent
+  # income. It seemed more like an exponential relationship. 
 
 
 #Q9: Random assignment simulation
 
   #a) Set seed so that simulations are replicable
-  set.seed(505050505)
+  set.seed(31305187)
 
   #Generate uniformly distributed random number between 0 and 1
   
@@ -147,9 +172,20 @@ median_rank <- median(nlsy$kid_inc_rank, na.rm = T)
   #b) (i) Generate new variable: treatment_group
 
   # YOUR CODE:
+nlsy <- nlsy %>%
+  mutate(treatment_group = if_else(random_number >= .5, 1, 0))
+
+# finding numbers for treatment and control groups
+
+nlsy %>%
+  group_by(treatment_group) %>%
+  count()
+
+
   
 
   #b) (ii) How many observations in treatment group? How many in control group?
+  # there are 2711 observations in the treatment group and 2775 in the control. 
   
   
   
@@ -158,7 +194,30 @@ median_rank <- median(nlsy$kid_inc_rank, na.rm = T)
     # YOUR CODE for treatment group:
   
     # YOUR CODE for control group:
+
+options(dplyr.width = Inf)
+
+# parent_inc mean for control = $46848 and treatment = $45967
+
+nlsy %>%
+  group_by(treatment_group) %>%
+  summarise_all("mean")
+
+# parent_inc sd for control = $46824 and treatment = $45329
+
+nlsy %>%
+  group_by(treatment_group) %>%
+  summarise_all("sd")
   
-    # ANSWER:
+    # ANSWER:The mean of the parent_inc variable in the control group = $46848
+    # and in the treatment group = $45967. The sd of the parent_inc variable in
+    # the control group = $46824 and in the treatment group = $45329. 
+
+# what is the pirpose of random assignment in an experiment? I would 100% prefer
+# to use random assignment as opposed to assigning groups myself because doing
+# it myself would probably result in bias of some sort and because it was not
+# random I could not make any causal claims. Additionally, it would be redundant
+# and time consuming to do the allocations myself when random assignment does a
+# good job at creating balanced and comparable groups. 
   
 
