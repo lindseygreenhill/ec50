@@ -31,10 +31,12 @@ library(skimr)
 library(statar)
 
 ## Read data 
+
 nlsy <- read_dta("nlsy97.dta")
 
 
-#Q1: Create Histogram of kid_income (hint: sample code is found in table 3 of the assignment page)
+#Q1: Create Histogram of kid_income (hint: sample code is found in table 3 of
+#the assignment page)
 
 ggplot(nlsy) +
   geom_histogram(aes(x = kid_income, y = ..density..),
@@ -45,14 +47,12 @@ ggplot(nlsy) +
 
 #Q2: Mean of kid_income
 
-  # YOUR CODE:
 mean <- mean(nlsy$kid_income, na.rm = T)
   
   # ANSWER: $70,499.94
 
 #Q3: Fraction below mean
 
-  # YOUR CODE:
 frac <- nlsy %>%
   mutate(below_mean = if_else(kid_income < mean, 1, 0)) %>%
   summarise(frac = mean(below_mean))
@@ -64,7 +64,6 @@ frac <- nlsy %>%
 
 #Q4: Median of kid income reported by summary()
 
-  # YOUR CODE:
 
 median <- median(nlsy$kid_income, na.rm = T)
   
@@ -73,8 +72,6 @@ median <- median(nlsy$kid_income, na.rm = T)
 
 #Q5: Standard deviation
 
-  # YOUR CODE:
-
 sd <- sd(nlsy$kid_income, na.rm = T)
   
   # ANSWER: The standard deviation = $59552.02
@@ -82,7 +79,6 @@ sd <- sd(nlsy$kid_income, na.rm = T)
 
 #Q6: Fraction within 1 and 2 standard deviations of mean
 
-  # YOUR CODE:
 
 data <- nlsy %>%
   mutate(one_sd = if_else(kid_income <= (mean + sd) & kid_income >= (mean - sd), 
@@ -98,9 +94,7 @@ frac_two <- mean(data$two_sd)
 
 #Q7: Generate percentile ranks
 
-  # YOUR CODE: 
-
-percentile_rank<-function(variable){ 
+percentile_rank <- function(variable){ 
   
   #Convert to ranks, taking care of potential missing values 
   r <- ifelse(is.na(variable), NA, rank(variable, ties.method = "average")) 
@@ -118,17 +112,14 @@ ggplot(nlsy) +
 
 #Compare mean and median in percentile ranks
 
-  # YOUR CODE:
 
 mean_rank <- mean(nlsy$kid_inc_rank, na.rm = T)
+
 median_rank <- median(nlsy$kid_inc_rank, na.rm = T)
 
 # The mean = 50.08 and the median = 50.11. 
 
-
 #Q8: Bin scatters to find variables related to kid_income
-
-  # YOUR CODE:
 
 # this looks linear
 
@@ -153,10 +144,11 @@ ggplot(nlsy, aes(x = mother_education, y = kid_income)) +
 ggplot(nlsy, aes(x = child_sat, y = kid_income)) +
   stat_smooth(method = "lm", se = FALSE) +
   stat_binmean(n = 20, geom = "point")
+
 # Which of the variables you chose seem to be non-linearly related to kid_income?
 
-  # ANSWER: The only variable I looked at that seemed to be non-linear is parent
-  # income. It seemed more like an exponential relationship. 
+  # ANSWER: child_education seems to be nonlinear and parent_income seems to be
+  # nonlinear (I think it looks more exponential). 
 
 
 #Q9: Random assignment simulation
@@ -182,7 +174,6 @@ nlsy %>%
   count()
 
 
-  
 
   #b) (ii) How many observations in treatment group? How many in control group?
   # there are 2711 observations in the treatment group and 2775 in the control. 
@@ -190,10 +181,6 @@ nlsy %>%
   
   
   #c) Compute sample mean and sample sd for all variables listed in table 1 
-  
-    # YOUR CODE for treatment group:
-  
-    # YOUR CODE for control group:
 
 options(dplyr.width = Inf)
 
@@ -213,11 +200,15 @@ nlsy %>%
     # and in the treatment group = $45967. The sd of the parent_inc variable in
     # the control group = $46824 and in the treatment group = $45329. 
 
-# what is the pirpose of random assignment in an experiment? I would 100% prefer
-# to use random assignment as opposed to assigning groups myself because doing
-# it myself would probably result in bias of some sort and because it was not
-# random I could not make any causal claims. Additionally, it would be redundant
-# and time consuming to do the allocations myself when random assignment does a
-# good job at creating balanced and comparable groups. 
+# what is the pirpose of random assignment in an experiment? The purpose of
+# random assignment in this experiment is to eliminate potential confounding
+# variables and create comparable groups. I would 100% prefer to use random
+# assignment as opposed to assigning groups myself because doing it myself would
+# probably result in bias of some sort and because it was not random I could not
+# make any causal claims. Additionally, even if I assigned groups according to a
+# few specified control variables, I might not create comparable groups with
+# regards to other factors that I have not specifically acounted for in my
+# sorting. As such, the best way to  create comparable treatment groups is
+# random assignment.
   
 
