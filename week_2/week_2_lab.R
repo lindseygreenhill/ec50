@@ -107,13 +107,14 @@ stat_5b <- (31.4183 + (.3728*100)) - (31.4183 + (.3728*0))
 # part b: 37.28. So the sample suggests that the world is more unequal than the
 # tax data does
 
-# I'm pretty sure this is wrong
+# check this
 
 stat_5c <- nlsy %>%
-  mutate(move_up_top = if_else(parent_inc_rank <= 20 & kid_inc_rank >= 80,
-                               1,
-                               0)) %>%
-  summarize(prob = mean(move_up_top))
+  filter(parent_inc_rank <= 20) %>%
+  mutate(move_up = if_else(kid_inc_rank >=80, 1, 0)) %>%
+  summarise(prob = mean(move_up))
+
+#ANSWER: 7.37%
 
 # do I need to adjust for inflation here?
 
@@ -142,7 +143,12 @@ stat_6b_b <- (25.70348 + (.29432*100)) - (25.70348 + (.29432*0))
 
 # ANSWER: 29.43
 
-# I AM MISSING STATISTIC 3
+stat_5c_b <- black_men %>%
+  filter(parent_inc_rank <= 20) %>%
+  mutate(move_up = if_else(kid_inc_rank >=80, 1, 0)) %>%
+  summarise(prob = mean(move_up))
+
+# ANSWER: 5.79%
 
 stat_6d_b <- black_men %>%
   mutate(earned_more_parents = if_else((kid_income/1.4767) > parent_inc, 1, 0)) %>%
@@ -166,7 +172,12 @@ stat_6b_w <- (40.11022 + (.26692*100)) - (40.11022 + (.26692*0))
 
 # ANSWER: 26.692
 
-# I AM MISSING STATISTIC 3
+stat_5c_w <- white_men %>%
+  filter(parent_inc_rank <= 20) %>%
+  mutate(move_up = if_else(kid_inc_rank >=80, 1, 0)) %>%
+  summarise(prob = mean(move_up))
+
+# ANWER: 10.3%  
 
 stat_6d_w <- white_men %>%
   mutate(earned_more_parents = if_else((kid_income/1.4767) > parent_inc, 1, 0)) %>%
