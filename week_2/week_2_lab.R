@@ -97,3 +97,79 @@ summary(mod)
 # 31.418 on average. 
 
 ########## Question 5 ###########
+
+stat_5a <- 31.4183 + (.3728*25)
+
+# part a: 40.74
+
+stat_5b <- (31.4183 + (.3728*100)) - (31.4183 + (.3728*0))
+
+# part b: 37.28. So the sample suggests that the world is more unequal than the
+# tax data does
+
+# I'm pretty sure this is wrong
+
+stat_5c <- nlsy %>%
+  mutate(move_up_top = if_else(parent_inc_rank <= 20 & kid_inc_rank >= 80,
+                               1,
+                               0)) %>%
+  summarize(prob = mean(move_up_top))
+
+# do I need to adjust for inflation here?
+
+stat_5d <- nlsy %>%
+  mutate(earned_more_parents = if_else((kid_income/1.4767) > parent_inc, 1, 0)) %>%
+  summarize(frac = mean(earned_more_parents))
+
+# part d: 50.9% of children born in the 1980s earned more than their parents
+# after adjusting for inflation
+
+########## Question 6 ###########
+
+# black men stats #
+
+black_men <- nlsy %>%
+  filter(female == 0, black == 1)
+
+black_men_mod <- lm(kid_inc_rank ~ parent_inc_rank, data = black_men)
+summary(black_men_mod)
+
+stat_6a_b <- 25.70348 + (.29432*25)
+
+# ANSWER: 33.03
+
+stat_6b_b <- (25.70348 + (.29432*100)) - (25.70348 + (.29432*0))
+
+# ANSWER: 29.43
+
+# I AM MISSING STATISTIC 3
+
+stat_6d_b <- black_men %>%
+  mutate(earned_more_parents = if_else((kid_income/1.4767) > parent_inc, 1, 0)) %>%
+  summarize(frac = mean(earned_more_parents))
+
+# ANSWER: 48.9
+
+# white men stats #
+
+white_men <- nlsy %>%
+  filter(female == 0, white == 1)
+
+white_men_mod <- lm(kid_inc_rank ~ parent_inc_rank, data = white_men)
+summary(white_men_mod)
+
+stat_6a_w <- 40.11022 + (.26692*25)
+
+# ANSWER: 46.783
+
+stat_6b_w <- (40.11022 + (.26692*100)) - (40.11022 + (.26692*0))
+
+# ANSWER: 26.692
+
+# I AM MISSING STATISTIC 3
+
+stat_6d_w <- white_men %>%
+  mutate(earned_more_parents = if_else((kid_income/1.4767) > parent_inc, 1, 0)) %>%
+  summarize(frac = mean(earned_more_parents))
+
+# ANSWER: 48.3
