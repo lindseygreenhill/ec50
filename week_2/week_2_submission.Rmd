@@ -1,0 +1,332 @@
+---
+title: "week_2_submission"
+author: "Lindsey Greenhill"
+date: "2/11/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, message=FALSE}
+library(tidyverse)
+library(haven)
+library(statar)
+library(stargazer)
+
+# reading in data
+
+nlsy <- read_dta("nlsy97.dta")
+```
+
+## Question 1
+
+```{r echo = FALSE}
+# Part a
+
+# creating new indicator variable for mother going to college
+
+nlsy <- nlsy %>%
+  mutate(mother_less_college = if_else(mother_education <= 12, 1, 0))
+
+# calculating fraction for both groups
+
+frac_1 <- nlsy %>%
+  group_by(mother_less_college) %>%
+  summarise(frac_kid_college = mean(child_college))
+
+# ANSWER: .182 fraction of the sample whose parents did not go to college
+# (measured by mother's education) went on to receive a college degree or
+# higher.
+
+# Part b 
+
+sd_1 <- nlsy %>%
+  group_by(mother_less_college) %>%
+  summarise(frac_kid_college = sd(child_college))
+
+# ANSWER: I calculated that 18.2% of the children whose parents had a high
+# school education or less went on to receive a college degree or higher. The
+# standard deviation of this statistic = .386. With this in mind,.182 seems
+# close to .209 because .209  is well within one standard deviation of .182.
+```
+
+### Part a and b
+
+18.18% of the children whose parents had a high school degree or less went on to
+receive a college degree or higher. The standard deviation os this statistic is 
+38.6%. With this is mind, 18.18% seems close to 20.9% because 20.9% is well within 
+one standard deviation of 18.2%. 
+
+## Question 2
+
+```{r echo=FALSE}
+
+# function from last week's lab
+
+percentile_rank <- function(variable){ 
+  
+  #Convert to ranks, taking care of potential missing values 
+  r <- ifelse(is.na(variable), NA, rank(variable, ties.method = "average")) 
+  
+  #Return percentile rank = rank normalized so max is 100 
+  100*r/max(r, na.rm = T) 
+} 
+
+# part a -- taken from lab 1
+
+nlsy$kid_inc_rank <-with(nlsy, percentile_rank(kid_income)) 
+nlsy$parent_inc_rank <-with(nlsy, percentile_rank(parent_inc)) 
+
+```
+
+Ranks generated in code. 
+
+## Question 3
+
+```{r echo = FALSE}
+# part a
+
+nlsy %>%
+  ggplot(aes(x = parent_inc_rank, y = kid_inc_rank)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = F) +
+  labs(title = "Scatter plot of kid_inc_rank vs. parent_inc_rank") +
+  theme_classic()
+
+
+# part b
+
+ggplot(nlsy, aes(x = parent_inc_rank, y = kid_inc_rank)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "binned scatter plot of kid_inc_rank vs. parent_inc_rank") +
+  theme_classic()
+
+# ANSWER: I think that the binned scatter plot is more useful in this instance
+# because it is much easier to see the relationship between the two variables.
+# In the basic scatter plot, many of the points overlap and it is difficult to
+# discern any clear pattern. With that being said, the scatterplot also probably
+# gives a more clear picture of the variability in the data. 
+
+```
+
+I think that the binned scatter plot is more useful in this instance
+because it is much easier to see the relationship between the two variables.
+In the basic scatter plot, many of the points overlap and it is difficult to
+discern any clear pattern. With that being said, the scatterplot also probably
+gives a more clear picture of the variability in the data. 
+
+\newpage
+
+## Question 4
+
+```{r echo=FALSE, results="asis"}
+mod_4 <- lm(kid_inc_rank ~ parent_inc_rank, data = nlsy)
+stargazer(mod_4,
+          type = "latex")
+
+# ANSWER: The intercept of the regression = 31.418. The estimated slope = .372.
+# The interpretation of this model is: for every 1 unit increases in the
+# parent_inc_rank variable, there is a .372 unit increase in the kid_inc_rank
+# variable on average. In simpler words, a 1 point increase in parent income rank
+# results in a .372 point increase in the kid income rank on average.
+# Additionally, when the parent_income_rank = 0, the kid_income_rank is equal to
+# 31.418 on average. 
+```
+
+The intercept of the regression = 31.418. The estimated slope = .371.
+
+\newpage
+
+
+## Question 5
+
+```{r echo=FALSE}
+stat_5a <- 31.4183 + (.3728*25)
+
+# part a: 40.74
+
+stat_5b <- (31.4183 + (.3728*100)) - (31.4183 + (.3728*0))
+
+# part b: 37.28. So the sample suggests that the world is more unequal than the
+# tax data does
+
+# check this. should it be inclusive?
+
+stat_5c <- nlsy %>%
+  filter(parent_inc_rank < 20) %>%
+  mutate(move_up = if_else(kid_inc_rank >=80, 1, 0)) %>%
+  summarise(prob = mean(move_up))
+
+#ANSWER: 7.37%
+
+# do I need to adjust for inflation here?
+
+stat_5d <- nlsy %>%
+  mutate(earned_more_parents = if_else((kid_income/1.4767) > parent_inc, 1, 0)) %>%
+  summarize(frac = mean(earned_more_parents))
+
+# part d: 50.9% of children born in the 1980s earned more than their parents
+# after adjusting for inflation
+```
+
+### Part a
+
+Statistic 1 for the sample = `r stat_5a`. This is less than the value Chetty 
+found using the full population data. 
+
+### Part b
+
+Statistic 2 for the sample = `r stat_5b`. This value is higher than the value 
+Chetty found using the full population data. 
+
+### Part c
+
+Statistic 3 for the sample = 7.37%. This value is less than the value Chetty 
+found using the full population data. 
+
+### Part d
+
+Statistic 4 for the sample = 50.9% (adjusting for inflation). This value is 
+slightly higher than the value Chetty calculated. 
+
+\newpage
+
+## Question 6
+
+```{r echo=FALSE, results = "asis"}
+# black men stats #
+
+black_men <- nlsy %>%
+  filter(female == 0, black == 1)
+
+black_men_mod <- lm(kid_inc_rank ~ parent_inc_rank, data = black_men)
+
+stat_6a_b <- 25.70348 + (.29432*25)
+
+# ANSWER: 33.03
+
+stat_6b_b <- (25.70348 + (.29432*100)) - (25.70348 + (.29432*0))
+
+# ANSWER: 29.43
+
+stat_5c_b <- black_men %>%
+  filter(parent_inc_rank < 20) %>%
+  mutate(move_up = if_else(kid_inc_rank >=80, 1, 0)) %>%
+  summarise(prob = mean(move_up))
+
+# ANSWER: 5.79%
+
+stat_6d_b <- black_men %>%
+  mutate(earned_more_parents = if_else((kid_income/1.4767) > parent_inc, 1, 0)) %>%
+  summarize(frac = mean(earned_more_parents))
+
+# ANSWER: 48.9
+
+# white men stats #
+
+white_men <- nlsy %>%
+  filter(female == 0, white == 1)
+
+white_men_mod <- lm(kid_inc_rank ~ parent_inc_rank, data = white_men)
+
+
+stat_6a_w <- 40.11022 + (.26692*25)
+
+# ANSWER: 46.783
+
+stat_6b_w <- (40.11022 + (.26692*100)) - (40.11022 + (.26692*0))
+
+# ANSWER: 26.692
+
+stat_5c_w <- white_men %>%
+  filter(parent_inc_rank < 20) %>%
+  mutate(move_up = if_else(kid_inc_rank >=80, 1, 0)) %>%
+  summarise(prob = mean(move_up))
+
+# ANWER: 10.3%  
+
+stat_6d_w <- white_men %>%
+  mutate(earned_more_parents = if_else((kid_income/1.4767) > parent_inc, 1, 0)) %>%
+  summarize(frac = mean(earned_more_parents))
+
+# ANSWER: 48.3
+
+```
+
+### Black Men Stats
+
+- Statistic 1 = 33.03
+- Statistic 2 = 29.43
+- Statistic 3 = 5.785%
+- Statistic 4 = 48.9%
+
+### White Men Stats
+
+- Statistic 1 = 46.783
+- Statistic 2 = 26.692
+- Statistic 3 = 10.27%
+- Statistic 4 = 48.3%
+
+### Comparison
+
+  Mobility seems higher for White men than Black men when comparing statistics 
+  1, 2, and 3. Mobility seems higher for Black men than for White men when comparing
+  statistic 2 and 4. 
+  
+  \newpage
+  
+## Question 7
+
+```{r echo=FALSE}
+
+# using the inclusive boundaries
+
+
+seven_a <- nlsy %>%
+  filter(parent_inc_rank >= 21.5 & parent_inc_rank <= 27.5) %>%
+  summarise(avg = mean(kid_inc_rank, na.rm = T))
+
+# the arithmetic mean of kid_inc_rank for children with parent_inc_rank between
+# 21.5 and 27.5 (inclusive) = 40.74838. This is pretty much the same value as
+# Statistic 1 calculated in 5a (40.7383.
+```
+
+### Part a
+
+The arithmetic mean of kid_inc_rank for children with parent_inc_rank between
+ 21.5 and 27.5 (inclusive) = 40.74838. This is pretty much the same value as
+ Statistic 1 calculated in 5a (40.7383.
+ 
+```{r echo=FALSE}
+set.seed(31305186)
+
+# random sample of 50
+
+samp <- sample_n(nlsy, 50)
+
+# model 7
+
+mod_7 <- lm(kid_inc_rank ~ parent_inc_rank, data = samp)
+
+seven_b <- 29.178 + (.324*25)
+
+```
+ 
+### Part b
+
+Statistic 1 for my random sample = 37.278
+
+```{r echo=FALSE}
+seven_c <- samp %>%
+  filter(parent_inc_rank >= 21.5 & parent_inc_rank <= 27.5) %>%
+  summarise(avg = mean(kid_inc_rank, na.rm = T))
+```
+
+### Part c
+
+The mean of the kid_inc_rank for children with parent_inc_rank between 21.5 and 27.5
+(inclusive) = 25.116 for my random sample. 
+
+### Part d
+
+The value I calculated in 7b is closer than the value I calculated in 7c to Chetty's
+estimate. 
