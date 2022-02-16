@@ -270,7 +270,7 @@ stat_6d_w <- white_men %>%
 
   Mobility seems higher for White men than Black men when comparing statistics 
   1, 2, and 3. Mobility seems higher for Black men than for White men when comparing
-  statistic 2 and 4. 
+  statistic 4. 
   
   \newpage
   
@@ -294,7 +294,7 @@ seven_a <- nlsy %>%
 
 The arithmetic mean of kid_inc_rank for children with parent_inc_rank between
  21.5 and 27.5 (inclusive) = 40.74838. This is pretty much the same value as
- Statistic 1 calculated in 5a (40.7383.
+ Statistic 1 calculated in 5a (40.7383).
  
 ```{r echo=FALSE}
 set.seed(31305186)

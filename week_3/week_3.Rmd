@@ -1,0 +1,98 @@
+---
+title: "week_3_lab"
+author: "Lindsey Greenhill"
+date: "2/15/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(haven)
+library(skimr)
+library(stargazer)
+
+mto <- read_dta("mto.dta")
+```
+
+## Question 1 (work on this)
+
+According to lecture, individuals who were young children in 1994-1998 and moved 
+as a result of MTO saw improved economic outcomes. These effects did not occur for 
+older childer in adults who moved. 
+
+## Question 2
+
+```{r echo=FALSE}
+
+# it looks like nobody in the control group moved
+
+c_moved <- mto %>%
+  filter(voucher == 0) %>%
+  summarise(frac_moved = mean(moved, na.rm = T))
+```
+
+## Question 3
+
+```{r echo=FALSE}
+
+# 43.06% moved
+
+t_moved <- mto %>%
+  filter(voucher == 1) %>%
+  summarise(frac_moved = mean(moved, na.rm = T))
+```
+
+43.06% of the individuals in the experimental group moved.
+
+## Question 4
+
+```{r echo=FALSE, results = "asis"}
+mod_4 <- lm(moved ~ voucher, data = mto)
+stargazer(mod_4, type = "latex")
+```
+
+- The estimated coefficient for voucher is the intent to treat effect of
+treatment. This coefficient is equal to the difference in fraction treated
+across treatment and control groups (or the difference between the value we
+calculated in question 3 and question 2).
+ 
+ ## Question 5
+ 
+ - Because the coefficient on voucher is less than 1, we know there is
+ non-compliance. DO WE NEED TO SAY EXACT COMPLIANCE RATE?
+ 
+ -The MTO experiment had one-sided non-compliance.
+ 
+ ## Question 6
+ 
+```{r echo=FALSE, results= "asis"}
+# creating model
+
+mod_6 <- lm(kessler ~ voucher, data = mto)
+
+# displaying model
+
+stargazer(mod_6, type = "latex")
+```
+ 
+ The intent to treat effect of the voucher on the kessler index = -.588
+ 
+ ## Question 7
+ 
+```{r echo=FALSE}
+
+# the treatment-on-the-treated effect = itt outcome / itt treatment or question
+# 6 / question 4
+
+tot <- -.588 / .4306
+```
+ 
+ The treatment-on-the-treated efect of actually using the experimental
+ voucher to move = -1.365. I calculated this by dividing the ITT of the outcome
+ by the ITT of the treatment. You need to make this adjustment because just 
+ using the ITT of the outcome would give a causal effect that is too small
+ because it doesn't take the compliance rate into account. 
+ 
+ 
+
