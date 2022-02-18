@@ -9,6 +9,7 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(haven)
+library(ggthemes)
 library(skimr)
 library(stargazer)
 
@@ -162,7 +163,7 @@ mto %>%
   labs(title = "Fraction Moved Treatment and Control",
        y = "Fraction Moved",
        x = "Group") +
-  theme_classic()
+  theme_clean()
 
 mto %>%
   mutate(voucher = as_factor(voucher)) %>%
@@ -176,7 +177,7 @@ mto %>%
        subtitle = "Not adjusted for TOT effect",
        y = "Mean Kessler",
        x = "Group") +
-  theme_classic()
+  theme_clean()
 
 tibble(group = c("Control", "Treatment"),
        mean_kessler = c(6.88, (6.88 - 1.365))) %>%
@@ -186,7 +187,7 @@ tibble(group = c("Control", "Treatment"),
        subtitle = "Adjusted for TOT effect",
        y = "Mean Kessler",
        x = "Group") +
-  theme_classic()
+  theme_clean()
   
 
 ```
