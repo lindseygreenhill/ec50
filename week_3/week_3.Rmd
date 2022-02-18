@@ -17,9 +17,9 @@ mto <- read_dta("mto.dta")
 
 ## Question 1 (work on this)
 
-According to lecture, individuals who were young children in 1994-1998 and moved 
-as a result of MTO saw improved economic outcomes. These effects did not occur for 
-older childer in adults who moved. 
+According to lecture, individuals who were young children in 1994-1998 and moved
+as a result of MTO saw improved economic outcomes. These effects did not occur
+for older childer in adults who moved.
 
 ## Question 2
 
@@ -60,9 +60,11 @@ calculated in question 3 and question 2).
  ## Question 5
  
  - Because the coefficient on voucher is less than 1, we know there is
- non-compliance. DO WE NEED TO SAY EXACT COMPLIANCE RATE?
+ non-compliance.  
  
- -The MTO experiment had one-sided non-compliance.
+ -The MTO experiment had one-sided non-compliance because there is 
+ non-compliance in the treatment group but full compliance in the control
+ group. 
  
  ## Question 6
  
@@ -88,11 +90,106 @@ stargazer(mod_6, type = "latex")
 tot <- -.588 / .4306
 ```
  
- The treatment-on-the-treated efect of actually using the experimental
+ The treatment-on-the-treated effect of actually using the experimental
  voucher to move = -1.365. I calculated this by dividing the ITT of the outcome
  by the ITT of the treatment. You need to make this adjustment because just 
  using the ITT of the outcome would give a causal effect that is too small
  because it doesn't take the compliance rate into account. 
  
+ 
+ ## Question 8
+ 
+ 
+```{r echo=FALSE}
+as_treated <- mto %>%
+  group_by(moved) %>%
+  summarise(avg_kessler = mean(kessler, na.rm = T))
+
+# avg for those who did not move = 6.6778 and avg for those who did move =
+# 6.1515 so the as treated = 6.1515 - 6.6778 = -5.263
+```
+ 
+ 
+ The as treated effect = -.5263
+ 
+ 
+ ## Question 9
+ 
+ 
+```{r echo = FALSE}
+v_pp <- mto %>%
+  filter(voucher == 1, moved == 1) %>%
+  summarise(avg_kessler = mean(kessler, na.rm = T))
+
+c_pp <- mto %>%
+  filter(voucher == 0) %>%
+  summarise(avg_kessler = mean(kessler, na.rm = T))
+
+pp <- v_pp - c_pp
+
+
+```
+ 
+ The per protocol analysis gives a result of -.729
+ 
+## Question 10
+
+- The treatement-on-the-treated effect = -1.365
+- The as treated effect = -.5263
+- The per protocol effect = -.729
+
+The treatment on the treated effect yields the biggest estimate. 
+
+## Question 11
+
+The per protocol and as treated approaches both face problems of selection
+bias and confounding variables because they invalidate the randomness in 
+the experiment that lets us claim causality in the first place. In contrast,
+the TOT analysis preserves the original randomess of the experiment. 
+
+## Question 12
+
+```{r echo=FALSE, message=FALSE}
+
+mto %>%
+  mutate(voucher = as_factor(voucher)) %>%
+  group_by(voucher) %>%
+  summarise(fraction_moved = mean(moved, na.rm = T)) %>%
+  ggplot(aes(x = voucher, y = fraction_moved)) +
+  geom_col(fill = "steelblue2") +
+  scale_x_discrete(breaks = c("0", "1"),
+                   labels = c("Control", "Treatment")) +
+  labs(title = "Fraction Moved Treatment and Control",
+       y = "Fraction Moved",
+       x = "Group") +
+  theme_classic()
+
+mto %>%
+  mutate(voucher = as_factor(voucher)) %>%
+  group_by(voucher) %>%
+  summarise(avg_kessler = mean(kessler, na.rm = T)) %>%
+  ggplot(aes(x = voucher, y = avg_kessler)) +
+  geom_col(fill = "steelblue2") +
+  scale_x_discrete(breaks = c("0", "1"),
+                   labels = c("Control", "Treatment")) +
+  labs(title = "Mean Kessler Treatment and Control",
+       subtitle = "Not adjusted for TOT effect",
+       y = "Mean Kessler",
+       x = "Group") +
+  theme_classic()
+
+tibble(group = c("Control", "Treatment"),
+       mean_kessler = c(6.88, (6.88 - 1.365))) %>%
+  ggplot(aes(x = group, y = mean_kessler)) +
+  geom_col(fill = "azure3") +
+  labs(title = "Mean Kessler Treatment and Control",
+       subtitle = "Adjusted for TOT effect",
+       y = "Mean Kessler",
+       x = "Group") +
+  theme_classic()
+  
+
+```
+
  
 
