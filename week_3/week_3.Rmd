@@ -19,8 +19,12 @@ mto <- read_dta("mto.dta")
 ## Question 1 (work on this)
 
 According to lecture, individuals who were young children in 1994-1998 and moved
-as a result of MTO saw improved economic outcomes. These effects did not occur
-for older childer in adults who moved.
+as a result of MTO saw significantly improved economic outcomes that lasted
+through their adult life (meaning that their incomes were higher than they would
+have been if they hadn't moved). However, these effects did not carry over for
+older children who moved (they did not see any significant increase in income as
+adults).
+
 
 ## Question 2
 
@@ -32,6 +36,8 @@ c_moved <- mto %>%
   filter(voucher == 0) %>%
   summarise(frac_moved = mean(moved, na.rm = T))
 ```
+
+Nobody in the control group moved. 
 
 ## Question 3
 
@@ -54,14 +60,15 @@ stargazer(mod_4, type = "latex")
 ```
 
 - The estimated coefficient for voucher is the intent to treat effect of
-treatment. This coefficient is equal to the difference in fraction treated
+treatment. This coefficient = .431 and is equal to the difference in fraction treated
 across treatment and control groups (or the difference between the value we
-calculated in question 3 and question 2).
+calculated in question 3 and question 2). It is also the compliance rate. 
  
  ## Question 5
  
  - Because the coefficient on voucher is less than 1, we know there is
- non-compliance.  
+ non-compliance. We also know from our regression that the compliance rate =
+ 43.1%
  
  -The MTO experiment had one-sided non-compliance because there is 
  non-compliance in the treatment group but full compliance in the control

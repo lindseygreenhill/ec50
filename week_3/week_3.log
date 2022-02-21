@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.30)  18 FEB 2022 11:43
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.30)  21 FEB 2022 10:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -528,13 +528,13 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 69.
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 95.
+(Font)              <10> on input line 100.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 95.
+(Font)              <7> on input line 100.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 95.
+(Font)              <5> on input line 100.
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1
-23.
+28.
 (/Users/lindseygreenhill/Library/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [1
@@ -542,38 +542,38 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 {/Users/lindseygreenhill/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdft
 ex.map}]
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 1
-89.
+96.
 (/Users/lindseygreenhill/Library/TinyTeX/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ) [2]
-<week_3_files/figure-latex/unnamed-chunk-8-1.pdf, id=60, 469.755pt x 325.215pt>
+<week_3_files/figure-latex/unnamed-chunk-8-1.pdf, id=59, 469.755pt x 325.215pt>
 
 File: week_3_files/figure-latex/unnamed-chunk-8-1.pdf Graphic file (type pdf)
 <use week_3_files/figure-latex/unnamed-chunk-8-1.pdf>
 Package pdftex.def Info: week_3_files/figure-latex/unnamed-chunk-8-1.pdf  used 
-on input line 226.
+on input line 233.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<week_3_files/figure-latex/unnamed-chunk-8-2.pdf, id=61, 469.755pt x 325.215pt>
+<week_3_files/figure-latex/unnamed-chunk-8-2.pdf, id=60, 469.755pt x 325.215pt>
 
 File: week_3_files/figure-latex/unnamed-chunk-8-2.pdf Graphic file (type pdf)
 <use week_3_files/figure-latex/unnamed-chunk-8-2.pdf>
 Package pdftex.def Info: week_3_files/figure-latex/unnamed-chunk-8-2.pdf  used 
-on input line 227.
+on input line 234.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<week_3_files/figure-latex/unnamed-chunk-8-3.pdf, id=62, 469.755pt x 325.215pt>
+<week_3_files/figure-latex/unnamed-chunk-8-3.pdf, id=61, 469.755pt x 325.215pt>
 
 File: week_3_files/figure-latex/unnamed-chunk-8-3.pdf Graphic file (type pdf)
 <use week_3_files/figure-latex/unnamed-chunk-8-3.pdf>
 Package pdftex.def Info: week_3_files/figure-latex/unnamed-chunk-8-3.pdf  used 
-on input line 228.
+on input line 235.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--229
+Underfull \hbox (badness 10000) in paragraph at lines 233--236
 []
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 226--229
+Underfull \hbox (badness 10000) in paragraph at lines 233--236
 []
  []
 
@@ -596,7 +596,7 @@ Here is how much of TeX's memory you used:
  27015 multiletter control sequences out of 15000+600000
  444670 words of font info for 65 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 71i,10n,74p,240b,381s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 71i,10n,74p,240b,385s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/Users/lindseygreenhill/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.
 enc}{/Users/lindseygreenhill/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-t
 s1.enc}{/Users/lindseygreenhill/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/l
@@ -613,7 +613,7 @@ brary/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/lindseygreenh
 ill/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/lindsey
 greenhill/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb></Users/li
 ndseygreenhill/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb>
-Output written on week_3.pdf (5 pages, 179279 bytes).
+Output written on week_3.pdf (5 pages, 180008 bytes).
 PDF statistics:
  140 PDF objects out of 1000 (max. 8388607)
  115 compressed objects within 2 object streams
