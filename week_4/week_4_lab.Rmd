@@ -1,0 +1,112 @@
+---
+title: "week_4_lab"
+author: "Lindsey Greenhill"
+date: "2/23/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(haven)
+library(gt)
+
+star <- read_dta("star.dta")
+```
+
+## Question 1
+  
+  It is important to randomize the teachers in addition to the students because
+  there could be reasons why one teacher is more likely to teach a small class
+  or a big class, and any of those reasons could act as confounding variables
+  in our analysis. 
+
+## Question 2
+
+```{r echo=FALSE}
+star %>%
+  group_by(small) %>%
+  summarise(avg_class = mean(class_size, na.rm = T)) %>%
+  gt()
+
+```
+
+
+The average class sizes are shown in the table above. As expected, class sizes
+are smaller in the classes assigned to be small than in the classes assigned
+to be large. 
+
+## Question 3
+
+```{r}
+
+# I will go back and make this into a function if I have time
+
+# math
+
+# calculating control meaan and sd
+
+control_mean_m <- star %>%
+  filter(small == 0) %>%
+  summarise(mean = mean(math, na.rm=T)) %>%
+  as.double()
+control_sd_m <- star %>%
+  filter(small == 0) %>%
+  summarise(sd = sd(math, na.rm=T)) %>%
+  as.double()
+
+# creating a new col
+
+star <- star %>%
+  mutate(standard_math = (math - control_mean_m)/control_sd_m)
+
+# repeating steps above
+
+# read
+
+control_mean_r <- star %>%
+  filter(small == 0) %>%
+  summarise(mean = mean(read, na.rm=T)) %>%
+  as.double()
+control_sd_r <- star %>%
+  filter(small == 0) %>%
+  summarise(sd = sd(read, na.rm=T)) %>%
+  as.double()
+star <- star %>%
+  mutate(standard_read = (read - control_mean_r)/control_sd_r)
+
+# wordskill
+
+control_mean_s <- star %>%
+  filter(small == 0) %>%
+  summarise(mean = mean(wordskill, na.rm=T)) %>%
+  as.double()
+control_sd_s <- star %>%
+  filter(small == 0) %>%
+  summarise(sd = sd(wordskill, na.rm=T)) %>%
+  as.double()
+star <- star %>%
+  mutate(standard_wordskill = 
+           (wordskill - control_mean_s)/control_sd_s)
+
+# listen
+
+control_mean_l <- star %>%
+  filter(small == 0) %>%
+  summarise(mean = mean(listen, na.rm=T)) %>%
+  as.double()
+control_sd_l <- star %>%
+  filter(small == 0) %>%
+  summarise(sd = sd(listen, na.rm=T)) %>%
+  as.double()
+star <- star %>%
+  mutate(standard_listen = (listen - control_mean_l)/control_sd_l)
+
+# calculating sat_index. for some reason mean function isn't working
+
+star_new <- star %>%
+  mutate(sat_index = (standard_math + standard_read + 
+                        standard_wordskill + standard_listen)/4)
+
+```
+
