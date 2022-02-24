@@ -40,7 +40,7 @@ to be large.
 
 ## Question 3
 
-```{r}
+```{r echo=FALSE}
 
 # I will go back and make this into a function if I have time
 
@@ -200,8 +200,6 @@ mod_5 <- lm(avg_index ~ small + factor(school_id),
 
 # part b
 
-summary(mod_5)
-
 sd(by_teacher$avg_index)
 
 
@@ -210,7 +208,7 @@ sd(by_teacher$avg_index)
 
 # part c
 
-by_teacher %>%
+means <- by_teacher %>%
   group_by(small) %>%
   summarise(mean_index = mean(avg_index))
 
