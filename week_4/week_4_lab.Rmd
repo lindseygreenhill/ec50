@@ -127,7 +127,7 @@ The histograms look very similar to each other.
 
 ## Question 4
 
-```{r echo=FALSE}
+```{r echo=FALSE, results = "asis"}
 
 # creating new dataframe by class
 
@@ -140,25 +140,24 @@ by_teacher <- star_new %>%
 
 mod_1 <- lm(teacher_experience ~ small, data = by_teacher)
 
-summary(mod_1)
 
 # creating regression for teacher_masters
 
 mod_2 <- lm(teacher_masters ~ small, data = by_teacher)
 
-summary(mod_2)
 
 # creating regression for teacher_white
 
 mod_3 <- lm(teacher_white ~ small, data = by_teacher)
 
-summary(mod_3)
 
 # teacher_black regression
 
 mod_4 <- lm(teacher_black ~ small, data = by_teacher)
 
-summary(mod_4)
+
+stargazer(mod_1, mod_2, mod_3, mod_4,
+          type = "latex")
 ```
 
 
@@ -189,4 +188,56 @@ significant because the greatest bounds of the confidence intervals suggest a
 12.5%  and 11.9% difference in groups, respectively. However, overall these
 differences do not seem overly troubliing to me and I think we still have 
 comparable teacher groups. 
+
+
+
+```{r echo=FALSE}
+
+# part a
+
+mod_5 <- lm(avg_index ~ small + factor(school_id),
+            data = by_teacher)
+
+# part b
+
+summary(mod_5)
+
+sd(by_teacher$avg_index)
+
+
+
+# the coefficient for small = .16917 and the se = .02269
+
+# part c
+
+by_teacher %>%
+  group_by(small) %>%
+  summarise(mean_index = mean(avg_index))
+
+col_data <- tibble(group = c("control", "treatment"),
+                   mean_index = c(.009, .171),
+                   se = c(NA, .041))
+col_data$ub <- col_data$mean_index + 1.96*col_data$se
+col_data$lb <- col_data$mean_index - 1.96*col_data$se
+
+col_data %>%
+  ggplot(aes(x = group, y = mean_index)) +
+  geom_col(fill = "azure3") +
+  geom_errorbar(aes(ymin = lb, ymax = ub),
+                width = .1) +
+  theme_clean() +
+  labs(title = "Average sat index scores for large (control) \nand small (treatment) classes")
+
+
+```
+
+- The coefficient estimate for small = .162. The SE = .041. The 95% CI = [.082,
+.224]. This value is statistically significant. This means that on average,
+small classes had average sat_index scores .162 higher than not small classes,
+holding all else constant. The standard deviation for the average sat_index in
+the data set = .5. Our estimate is within this one standard deviation, so it
+does not seem very practically significant to me.
+
+
+
 
