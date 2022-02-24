@@ -9,6 +9,8 @@ output: pdf_document
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(haven)
+library(ggthemes)
+library(stargazer)
 library(gt)
 
 star <- read_dta("star.dta")
@@ -108,5 +110,83 @@ star_new <- star %>%
   mutate(sat_index = (standard_math + standard_read + 
                         standard_wordskill + standard_listen)/4)
 
+# plotting a histogram
+
+star_new %>%
+  ggplot(aes(x = sat_index, y = ..density..)) +
+  geom_histogram(bins = 30) +
+  facet_wrap(~small) +
+  theme_clean() +
+  labs(title = "Distribution of sat_index by class size")
+
 ```
+
+The histograms look very similar to each other. 
+
+\newpage
+
+## Question 4
+
+```{r echo=FALSE}
+
+# creating new dataframe by class
+
+by_teacher <- star_new %>%
+  group_by(teacher_id, small, school_id, teacher_masters, teacher_white,
+         teacher_black, teacher_experience) %>%
+  summarise(avg_index = mean(sat_index, na.rm = T))
+
+# creating regression for small
+
+mod_1 <- lm(teacher_experience ~ small, data = by_teacher)
+
+summary(mod_1)
+
+# creating regression for teacher_masters
+
+mod_2 <- lm(teacher_masters ~ small, data = by_teacher)
+
+summary(mod_2)
+
+# creating regression for teacher_white
+
+mod_3 <- lm(teacher_white ~ small, data = by_teacher)
+
+summary(mod_3)
+
+# teacher_black regression
+
+mod_4 <- lm(teacher_black ~ small, data = by_teacher)
+
+summary(mod_4)
+```
+
+
+- teacher_experience: The standard error for the small coefficient = .6649. 
+1.96 x .6649 = 1.303. The resulting 95% confidence interval 
+of the coefficient = -.4107 +/- 1.303. Or [-.8923, 1.7137].
+
+- teacher_masters: The standard error for the small coefficient = .05426.
+1.96 x .05426 = .1063. The resulting 95% confidence interval for the coefficient
+= -.0408 +/- .1063. Or [-.1471, .06554]
+
+- teacher_white: the small standard error = .04174. The small coefficient =
+.04291. The 95% confidence interval = .04291 +/- 1.96*.04174 or [-.0389,.1247]
+
+- teacher_black: the small standard error = .04143. The small coefficient = -.03786. 
+The 95% CI = -.0376 +/- 1.96*.04143 or [-.119,.0433]
+
+- The differences in teacher characteristics in small vs. large class sizes are
+not statistically significant for any of the characteristics we looked at above.
+This means that statistically the randomization was successful in balancing
+teacher characteristics. From the practical standard, the values for
+teacher_experience do not seem practically significant because they refer to a
+difference of about 1 year which doesn't seem like a lot. The teacher masters
+seems to bit more practically significant, as the lower bound of the confidence
+interval implies about a 15% difference between the two groups of teachers. Both
+the teacher_white and teacher_black results also seem a bit practically
+significant because the greatest bounds of the confidence intervals suggest a
+12.5%  and 11.9% difference in groups, respectively. However, overall these
+differences do not seem overly troubliing to me and I think we still have 
+comparable teacher groups. 
 
