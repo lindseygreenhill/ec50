@@ -1,0 +1,211 @@
+---
+title: "stamford_atlas"
+author: "Lindsey Greenhill"
+date: "2/25/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggthemes)
+library(tidyverse)
+library(vtable)
+library(gt)
+library(haven)
+
+atlas <- read_dta("atlas.dta")
+
+# subsetting to CT, fairfield county, 
+fc <- atlas %>%
+  filter(state == 9, county == 001)
+```
+
+## Question 2
+
+The kfr_pooled_pooled_p25 is the absolute mobility at the 25th percentile
+for each census tract. In other words, this statistic measures the average 
+income percentile rank for children whose parents were at the 25th percentile
+in income. In this data set, the unit is the census tract. Higher values
+correspond to higher upward mobility. This statistic is estimated using a linear
+model because the data is pretty linear when plotted child income rank vs. 
+parent income rank. As such, a linear regression fits the data well. 
+
+\newpage
+
+## Question 3
+
+```{r echo=FALSE, warning=FALSE}
+
+atlas %>%
+  ggplot(aes(x = kfr_pooled_pooled_p25,
+             y = ..density..)) +
+  geom_histogram(binwidth = 1,
+                 fill = "azure3") +
+  geom_vline(xintercept = mean(atlas$kfr_pooled_pooled_p25, na.rm = T)) +
+  labs(title = "Distribution of kfr_pooled_pooled_p25",
+       subtitle = "Mean = 42.86") +
+  theme_clean()
+  
+
+```
+
+- The mean value of kfr_pooled_pooled_p25 = 42.86. This means that on average
+kids with parents in the 25th percentile of income distribution have adult
+incomes in about the 43rd percentile of the income distribution. The data looks
+relatively normally distributed.
+
+\newpage
+
+## Question 4 (CHECK ANSWER)
+
+```{r echo=FALSE, results = "asis"}
+sumtable(atlas,
+         vars = c("kfr_pooled_pooled_p25"),
+         summ = c("mean(x)",
+                  "sd(x)",
+                  "min(x)",
+                  "max(x)"),
+         out = "latex")
+```
+
+
+- The variable can be negative or above 100 because the linear
+model does not have an upper and lower bound to it. That is,
+it will not correct for values that are over or under the 
+possible outcomes of 0 to 100. For this reason, another model
+(maybe a glm model) could be better to use to bound the values to 0 and 100. 
+
+## Question 5
+
+```{r echo=FALSE}
+gw_mean <- atlas %>%
+  filter(state == 9,
+         county == 1,
+         tract == 11200) %>%
+  select(kfr_pooled_pooled_p25)
+
+# the bellehaven mean = 48.5
+
+ct_mean <- atlas %>%
+  filter(state == 9) %>%
+  summarise(avg = mean(kfr_pooled_pooled_p25,
+                       na.rm = T))
+
+# the CT average is 44.8
+
+USA_mean <- atlas %>%
+  summarise(avg = mean(kfr_pooled_pooled_p25,
+                       na.rm = T))
+
+# the national mean = 42.86
+
+comparative_means <- tibble(place = c("Belle Haven",
+                                      "CT",
+                                      "USA"),
+                            avg_kfr_pooled_pooled_p25 = 
+                              c(48.5, 44.8, 42.86)) %>%
+  gt()
+comparative_means
+
+
+
+```
+
+
+My home census tract is 11200 in Fairfield county in CT. My neighborhood is
+called Belle haven. The value for kfr_pooled_pooled_p25 = 48.5, which is higher
+than the state average of 44.8 and national average of 42.86. This implies that
+kids in Belle Haven have a better chance than the average Connecticution and
+average American of climbing the income latter.
+
+## Question 6
+
+```{r echo=FALSE}
+
+fc_mean_sd <- atlas %>%
+  filter(state == 9,
+         county == 1) %>%
+  summarise(avg = sd(kfr_pooled_pooled_p25,
+                       na.rm = T))
+
+# the fairfield county mean = 8.15
+
+ct_mean_sd <- atlas %>%
+  filter(state == 9) %>%
+  summarise(avg = sd(kfr_pooled_pooled_p25,
+                       na.rm = T))
+
+# the CT average is 7
+
+USA_mean_sd <- atlas %>%
+  summarise(avg = sd(kfr_pooled_pooled_p25,
+                       na.rm = T))
+
+# the national mean = 7.12
+
+comparative_sd <- tibble(place = c("Fairfield County",
+                                      "CT",
+                                      "USA"),
+                            sd_kfr_pooled_pooled_p25 = 
+                              c(8.15, 7, 7.12)) %>%
+  gt()
+comparative_sd
+
+```
+
+The standard deviation in fairfield county = 8.15, which is higher than the CT
+sd of 7 and national sd of 7.12. This means that there is more variation in
+upward mobility in my home county than in CT as a whole and the country as a
+whole. Subtantively, this means that while there are areas in my county where
+upward mobility is quite high, there are also probably areas in my county where
+upward mobility is quite low. In other words, a larger sd is probbaly more
+indicative of more values at either end of the spectrum.
+
+\newpage
+
+## Question 7
+
+```{r echo=FALSE}
+
+# looking at redlining 
+
+A <- atlas %>%
+  filter(HOLC_A > .5,
+         !is.na(HOLC_A)) %>%
+  summarise(avg = mean(kfr_pooled_pooled_p25, na.rm = T)) %>%
+  as.double()
+
+B <- atlas %>%
+  filter(HOLC_B > .5,
+         !is.na(HOLC_B)) %>%
+  summarise(avg = mean(kfr_pooled_pooled_p25, na.rm = T)) %>%
+  as.double()
+
+C <- atlas %>%
+  filter(HOLC_C > .5,
+         !is.na(HOLC_C)) %>%
+  summarise(avg = mean(kfr_pooled_pooled_p25, na.rm = T)) %>%
+  as.double()
+
+D <- atlas %>%
+  filter(HOLC_D > .5,
+         !is.na(HOLC_D)) %>%
+  summarise(avg = mean(kfr_pooled_pooled_p25, na.rm = T)) %>%
+  as.double()
+
+tibble(HOLC_grade = c("A",
+                      "B",
+                      "C",
+                      "D"),
+       avg_kfr_pooled_pooled_p25 = 
+         c(44.01, 42.46, 39.87, 36.16)) %>%
+  gt()
+```
+The averages of the kfr_pooled_pooled_p25 for majority A, B, C, and D HOLC
+neighborhoods are shown in the table above. It seems that in neighborhoods where
+redlining was worse upward mobility is lower than in neighborhoods where
+redlining was not prevalent.
+
+
+
+
