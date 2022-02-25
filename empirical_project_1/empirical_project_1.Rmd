@@ -10,7 +10,9 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggthemes)
 library(tidyverse)
 library(vtable)
+library(statar)
 library(gt)
+library(ggpubr)
 library(haven)
 
 atlas <- read_dta("atlas.dta")
@@ -201,11 +203,230 @@ tibble(HOLC_grade = c("A",
          c(44.01, 42.46, 39.87, 36.16)) %>%
   gt()
 ```
+
 The averages of the kfr_pooled_pooled_p25 for majority A, B, C, and D HOLC
 neighborhoods are shown in the table above. It seems that in neighborhoods where
 redlining was worse upward mobility is lower than in neighborhoods where
 redlining was not prevalent.
 
+\newpage
+
+## Question 8
+
+### Part a
+
+```{r echo=FALSE, warning = FALSE, message=FALSE}
+
+# this looks at the average school district level standardized test scores in
+# 3rd grade in 2013
+
+school <- fc %>%
+  ggplot(aes(x = gsmn_math_g3_2013, y = kfr_pooled_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. Third Grade Standardized Tests",
+       subtitle = "Mobility is higher is areas with higher scores") +
+  theme_clean()
+
+# I'm choosing the most recent parent share because that is consistent with the
+# school test, but I could have used it from 1990 and then arguably could have
+# made more sense
+
+single_parents <- fc %>%
+  ggplot(aes(x = singleparent_share2010, y = kfr_pooled_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. Share Single Parent Households",
+       subtitle = "Mobility is higher in areas with fewer single parent households") +
+  theme_clean()
+
+school
+single_parents
+
+```
 
 
+ - There seems to be a strong relationship between the kfr_pooled_pooled_25
+variable and the gsmn_math_g3_2013 variable, which measures the average school
+district level sstandardized test scores in third grade in 2013 (where 3 is
+where third graders should be, 1 would be where first graders should be, etc.)
+It appears that upwarad mobility is higher in areas where students perform
+better on these standardized tests.
+
+- There seems to be a strong relationship between the kfr_pooled_pooled_25
+variable and the single_parent_share2010 variable, which measures the share of
+single-headed households with children 2006-2010. It appears that upward
+mobility is higher in areas with a smaller porportion of single parent
+households. Note: I could have used the 1990 or 2000 measure for this variable,
+but I chose to use the 2010 one so it is consistent with the test score
+meassure.
+
+### Part b
+
+```{r echo=FALSE}
+
+# have to drop na values for the cor function to work
+
+# schools correlation
+
+fc_drop <- fc %>%
+  select(tract, kfr_pooled_pooled_p25, gsmn_math_g3_2013) %>%
+  drop_na()
+
+cor_school <- cor(fc_drop$kfr_pooled_pooled_p25, fc_drop$gsmn_math_g3_2013)
+
+# single parent correlation
+
+fc_drop_sp <- fc %>%
+  select(tract, kfr_pooled_pooled_p25, singleparent_share2010) %>%
+  drop_na()
+
+cor_sp <- cor(fc_drop_sp$kfr_pooled_pooled_p25, fc_drop_sp$singleparent_share2010)
+```
+
+- The correlation of kfr_pooled_pooled_p25 and 
+gsmn_math_g3_2013 = `r cor_school`
+
+- The correlation of kfr_pooled_pooled_p25 and 
+singleparent_share2010 = `r cor_sp`
+
+## Question 9
+
+### Third Grade Test Scores (ADD DISCUSSION)
+
+The graphs below show the relationship between upward mobility and 3rd grade
+test scores by race. The graphs are binned scatterplots and the correlations
+for the relationships can be found in the subtitle of the graphs. 
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# first looking at test scores
+
+school_w <- fc %>%
+  ggplot(aes(x = gsmn_math_g3_2013, y = kfr_white_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. \n3rd Grade Standardized Tests",
+       subtitle = "Race = white, cor = .38") +
+  theme_classic()
+
+# new way to drop nas
+
+cor_school_w <- cor(fc$kfr_white_pooled_p25, fc$gsmn_math_g3_2013,
+                  use = "complete.obs")
+# black
+
+school_b <- fc %>%
+  ggplot(aes(x = gsmn_math_g3_2013, y = kfr_black_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. \n3rd Grade Standardized Tests",
+       subtitle = "Race = black, cor = .29") +
+  theme_classic()
+
+cor_school_b <- cor(fc$kfr_black_pooled_p25, fc$gsmn_math_g3_2013,
+                  use = "complete.obs")
+
+# hispanic
+
+school_h <- fc %>%
+  ggplot(aes(x = gsmn_math_g3_2013, y = kfr_hisp_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. \n3rd Grade Standardized Tests",
+       subtitle = "Race = hispanic, cor = .52") +
+  theme_classic()
+
+cor_school_h <- cor(fc$kfr_hisp_pooled_p25, fc$gsmn_math_g3_2013,
+                  use = "complete.obs")
+
+# asian
+
+school_a <- fc %>%
+  ggplot(aes(x = gsmn_math_g3_2013, y = kfr_asian_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. \n3rd Grade Standardized Tests",
+       subtitle = "Race = asian, cor = .32") +
+  theme_classic()
+
+cor_school_a <- cor(fc$kfr_asian_pooled_p25, fc$gsmn_math_g3_2013,
+                  use = "complete.obs")
+
+# displaying graphs
+
+ggarrange(school_w,school_b,school_h,school_a)
+```
+
+### Single Parent Households
+
+The graphs below show the relationship between upward mobility and share of
+single parent households by race. The graphs are binned scatterplots and the
+correlations for the relationships can be found in the subtitle of the graphs.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# single parent share
+
+sp_w <- fc %>%
+  ggplot(aes(x = singleparent_share2010, y = kfr_white_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. \nSingle Parent Share",
+       subtitle = "Race = white, cor = -.45") +
+  theme_classic()
+
+# new way to drop nas
+
+cor_p_w <- cor(fc$kfr_white_pooled_p25, fc$singleparent_share2010,
+                  use = "complete.obs")
+# black
+
+sp_b <- fc %>%
+  ggplot(aes(x = singleparent_share2010, y = kfr_black_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. \nSingle Parent Share",
+       subtitle = "Race = black, cor = -.17") +
+  theme_classic()
+
+# new way to drop nas
+
+cor_p_b <- cor(fc$kfr_black_pooled_p25, fc$singleparent_share2010,
+                  use = "complete.obs")
+
+# hispanic
+
+sp_h <- fc %>%
+  ggplot(aes(x = singleparent_share2010, y = kfr_hisp_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. \nSingle Parent Share",
+       subtitle = "Race = hispanic, cor = -.46") +
+  theme_classic()
+
+# new way to drop nas
+
+cor_p_h <- cor(fc$kfr_hisp_pooled_p25, fc$singleparent_share2010,
+                  use = "complete.obs")
+
+# asian
+
+sp_a <- fc %>%
+  ggplot(aes(x = singleparent_share2010, y = kfr_asian_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. \nSingle Parent Share",
+       subtitle = "Race = asian, cor = -.24") +
+  theme_classic()
+
+# new way to drop nas
+
+cor_p_a <- cor(fc$kfr_asian_pooled_p25, fc$singleparent_share2010,
+                  use = "complete.obs")
+
+# displaying graphs
+
+ggarrange(sp_w, sp_b, sp_h, sp_a)
+```
 
