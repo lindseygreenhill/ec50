@@ -19,9 +19,12 @@ star <- read_dta("star.dta")
 ## Question 1
   
   It is important to randomize the teachers in addition to the students because
-  there could be reasons why one teacher is more likely to teach a small class
-  or a big class, and any of those reasons could act as confounding variables
-  in our analysis. 
+  teachers could have significant impacts on the results of the study. For
+  example, if we didn't randomize teachers and good tearchers happened to be
+  more likely to teach small classes than bad teachers, then we would get a
+  result that tells us small classes produce better results than large classes,
+  but the driving force behind that finding would be teacher quality and not
+  class size.
 
 ## Question 2
 
@@ -121,7 +124,8 @@ star_new %>%
 
 ```
 
-The histograms look very similar to each other. 
+The histograms look very similar to each other. The treatment group histogram
+may be shifted slightly to the right, but it is difficult to tell. 
 
 \newpage
 
@@ -163,7 +167,7 @@ stargazer(mod_1, mod_2, mod_3, mod_4,
 
 - teacher_experience: The standard error for the small coefficient = .6649. 
 1.96 x .6649 = 1.303. The resulting 95% confidence interval 
-of the coefficient = -.4107 +/- 1.303. Or [-.8923, 1.7137].
+of the coefficient = -.4107 +/- 1.303. Or [-1.7137, .8923].
 
 - teacher_masters: The standard error for the small coefficient = .05426.
 1.96 x .05426 = .1063. The resulting 95% confidence interval for the coefficient
@@ -189,6 +193,7 @@ significant because the greatest bounds of the confidence intervals suggest a
 differences do not seem overly troubliing to me and I think we still have 
 comparable teacher groups. 
 
+## Question 5
 
 
 ```{r echo=FALSE}
@@ -200,7 +205,7 @@ mod_5 <- lm(avg_index ~ small + factor(school_id),
 
 # part b
 
-sd(by_teacher$avg_index)
+# sd(by_teacher$avg_index)
 
 
 
