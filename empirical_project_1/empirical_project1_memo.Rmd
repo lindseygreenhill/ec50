@@ -1,0 +1,156 @@
+---
+title: "empirical_project1_memo"
+author: "Lindsey Greenhill"
+date: "3/7/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggthemes)
+library(tidyverse)
+library(tidycensus)
+library(vtable)
+library(statar)
+library(RColorBrewer)
+library(wesanderson)
+library(viridis)
+library(gt)
+library(ggpubr)
+library(haven)
+
+# subsetting to CT, fairfield county, 
+fc <- atlas %>%
+  filter(state == 9, county == 001)
+
+ct <- atlas %>%
+  filter(state == 9)
+
+atlas <- atlas %>%
+  mutate(fc = if_else(state == 9 & county == 001, 1, 0),
+         ct = if_else(state == 9, 1, 0))
+```
+
+### looking at variables I care about
+
+```{r echo=FASLE}
+
+## distribution of absolute mobility nationally, state, and in FC
+
+US_25 <- atlas %>%
+  ggplot(aes(x = kfr_pooled_pooled_p25,
+             y = ..density..)) +
+  geom_histogram(binwidth = 1,
+                 fill = "azure3") +
+  geom_vline(xintercept = mean(atlas$kfr_pooled_pooled_p25, na.rm = T)) +
+  labs(title = "Distribution of kfr_pooled_pooled_p25 (US)",
+       subtitle = "Mean = 42.86") +
+  scale_x_continuous(limits = c(0,100)) +
+  theme_clean()
+
+ct_25 <- ct %>%
+  ggplot(aes(x = kfr_pooled_pooled_p25,
+             y = ..density..)) +
+  geom_histogram(binwidth = 1,
+                 fill = "azure3") +
+  geom_vline(xintercept = mean(ct$kfr_pooled_pooled_p25, na.rm = T)) +
+  labs(title = "Distribution of kfr_pooled_pooled_p25 (CT)",
+       subtitle = "Mean = 44.81") +
+  scale_x_continuous(limits = c(0,100)) +
+  theme_clean()
+
+fc_25 <- fc %>%
+  ggplot(aes(x = kfr_pooled_pooled_p25,
+             y = ..density..)) +
+  geom_histogram(binwidth = 1,
+                 fill = "azure3") +
+  geom_vline(xintercept = mean(fc$kfr_pooled_pooled_p25, na.rm = T)) +
+  labs(title = "Distribution of kfr_pooled_pooled_p25 (FC)",
+       subtitle = "Mean = 47.79") +
+  scale_x_continuous(limits = c(0,100)) +
+  theme_clean()
+
+
+ggarrange(US_25, ct_25, fc_25)
+
+
+# standard deviations
+
+comparative_sd <- tibble(place = c("Fairfield County",
+                                      "CT",
+                                      "USA"),
+                            sd_kfr_pooled_pooled_p25 = 
+                              c(8.15, 7, 7.12)) %>%
+  gt()
+
+  
+```
+
+
+## looking at education now
+
+```{r}
+
+# here we see the national pattern
+
+school_national <- atlas %>%
+  ggplot(aes(x = gsmn_math_g3_2013, y = kfr_pooled_pooled_p25)) +
+  stat_binmean(n = 20, geom = "point") +
+  stat_smooth(method = "lm", se = FALSE) +
+  labs(title = "Upward Mobility vs. Third Grade Standardized Tests",
+       subtitle = "Mobility is higher is areas with higher scores") +
+  theme_clean()
+
+
+ct_acs <- get_acs(geography = "tract",
+              geometry = TRUE,
+              state = "CT",
+              variables = "B19013_001")
+
+ct_joined <- ct_acs %>%
+  mutate(tract = as.double(str_sub(GEOID, start = -6))) %>%
+  left_join(ct, by = "tract") %>%
+  select(GEOID, county, NAME, tract,gsmn_math_g3_2013, kfr_pooled_pooled_p25) %>%
+  filter(county == 1) %>%
+  mutate(dot_color = as_factor(case_when(tract == 70300 ~ "Westside, Bridgeport",
+                            tract == 35400 ~ "New Canaan",
+                            TRUE ~ "other")))
+
+# now going to zoom in to fairfield county
+
+school_fc <- ct_joined %>%
+  ggplot(aes(x = gsmn_math_g3_2013, y = kfr_pooled_pooled_p25)) +
+  geom_point(aes(col = dot_color)) +
+  stat_smooth(method = "lm", se = FALSE) +
+  scale_x_continuous(limits = c(.75, 7)) +
+  scale_color_manual(values = c("black", "red", "forestgreen")) +
+  annotate("text", x = 2.3, y = 25, label = "Westside, Bridgeport",
+           col = "red") +
+  annotate("text", x = 6.5, y = 66, label = "New Canaan",
+           col = "forestgreen") +
+ guides(col = FALSE) +
+  labs(title = "Absolute mobility p25 vs. 3rd Grade Test Scores") +
+  theme_clean()
+
+fc_limited <- fc %>%
+  select(czname, tract, gsmn_math_g3_2013, kfr_pooled_pooled_p25) %>%
+  arrange(gsmn_math_g3_2013) %>%
+  head(10) 
+
+# lowest scores are tracts 
+
+
+
+
+pal <- wes_palette("GrandBudapest1", 100, type = "continuous")
+
+ct_joined %>%
+  filter(county == 1) %>%
+  ggplot(aes(fill = gsmn_math_g3_2013)) +
+  geom_sf() +
+  scale_fill_viridis(option = "B") +
+  theme_void()
+
+# bridgeport and Danbury have the worst it looks like
+```
+
