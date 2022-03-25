@@ -1,5 +1,5 @@
 ---
-title: "stamford_atlas"
+title: "FC_atlas"
 author: "Lindsey Greenhill"
 date: "2/25/2022"
 output: pdf_document
@@ -58,7 +58,7 @@ relatively normally distributed.
 
 \newpage
 
-## Question 4 (CHECK ANSWER)
+## Question 4 
 
 ```{r echo=FALSE, results = "asis"}
 sumtable(atlas,
@@ -292,11 +292,11 @@ singleparent_share2010 = `r cor_sp`
 
 ## Question 9
 
-### Third Grade Test Scores (ADD DISCUSSION)
+### Third Grade Test Scores 
 
 The graphs below show the relationship between upward mobility and 3rd grade
 test scores by race. The graphs are binned scatterplots and the correlations
-for the relationships can be found in the subtitle of the graphs. 
+for the relationships can be found in the subtitle of the graphs. Looking at the graphs, it is evident that there are differences in the strength of the correlation between upward mobility and standardized test scores among different racial groups. The correlation between these two variables is strongest for hispanics, followed by whites, asians, and blacks. 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
@@ -362,7 +362,7 @@ ggarrange(school_w,school_b,school_h,school_a)
 
 The graphs below show the relationship between upward mobility and share of
 single parent households by race. The graphs are binned scatterplots and the
-correlations for the relationships can be found in the subtitle of the graphs.
+correlations for the relationships can be found in the subtitle of the graphs. As with what we saw in the standardized test score analysis, there is variation in the correlation coefficients of upward mobility and single parent household among racial groups. The correlation is strongest for whites and hispanics, followed by asians and blacks. 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 

@@ -15,25 +15,32 @@ library(statar)
 library(RColorBrewer)
 library(wesanderson)
 library(viridis)
+library(stargazer)
 library(gt)
 library(ggpubr)
 library(haven)
 
+atlas <- read_dta("atlas.dta")
+
 # subsetting to CT, fairfield county, 
+
+atlas <- atlas %>%
+  mutate(fc = if_else(state == 9 & county == 001, 1, 0),
+         ct = if_else(state == 9, 1, 0)) %>%
+  mutate(national_rank_education = percent_rank(gsmn_math_g3_2013),
+         national_rank_mobility = percent_rank(kfr_pooled_pooled_p25))
+
 fc <- atlas %>%
   filter(state == 9, county == 001)
 
 ct <- atlas %>%
   filter(state == 9)
 
-atlas <- atlas %>%
-  mutate(fc = if_else(state == 9 & county == 001, 1, 0),
-         ct = if_else(state == 9, 1, 0))
 ```
 
 ### looking at variables I care about
 
-```{r echo=FASLE}
+```{r echo=FALSE}
 
 ## distribution of absolute mobility nationally, state, and in FC
 
@@ -43,10 +50,11 @@ US_25 <- atlas %>%
   geom_histogram(binwidth = 1,
                  fill = "azure3") +
   geom_vline(xintercept = mean(atlas$kfr_pooled_pooled_p25, na.rm = T)) +
-  labs(title = "Distribution of kfr_pooled_pooled_p25 (US)",
+  labs(title = "Distribution of Absolute Mobility \n at the 25th percentile (US)",
        subtitle = "Mean = 42.86") +
   scale_x_continuous(limits = c(0,100)) +
-  theme_clean()
+  theme_clean()+
+  theme(plot.title = element_text(size = 12)) 
 
 ct_25 <- ct %>%
   ggplot(aes(x = kfr_pooled_pooled_p25,
@@ -54,10 +62,11 @@ ct_25 <- ct %>%
   geom_histogram(binwidth = 1,
                  fill = "azure3") +
   geom_vline(xintercept = mean(ct$kfr_pooled_pooled_p25, na.rm = T)) +
-  labs(title = "Distribution of kfr_pooled_pooled_p25 (CT)",
+  labs(title = "Distribution ofAbsolute Mobility \n at the 25th percentile (CT)",
        subtitle = "Mean = 44.81") +
   scale_x_continuous(limits = c(0,100)) +
-  theme_clean()
+  theme_clean()+
+  theme(plot.title = element_text(size = 12)) 
 
 fc_25 <- fc %>%
   ggplot(aes(x = kfr_pooled_pooled_p25,
@@ -65,10 +74,12 @@ fc_25 <- fc %>%
   geom_histogram(binwidth = 1,
                  fill = "azure3") +
   geom_vline(xintercept = mean(fc$kfr_pooled_pooled_p25, na.rm = T)) +
-  labs(title = "Distribution of kfr_pooled_pooled_p25 (FC)",
+  labs(title = "Distribution of Absolute Mobility \n at the 25th percentile (FC)",
        subtitle = "Mean = 47.79") +
   scale_x_continuous(limits = c(0,100)) +
-  theme_clean()
+  theme_clean() +
+  theme(plot.title = element_text(size = 12)) 
+  
 
 
 ggarrange(US_25, ct_25, fc_25)
@@ -81,7 +92,11 @@ comparative_sd <- tibble(place = c("Fairfield County",
                                       "USA"),
                             sd_kfr_pooled_pooled_p25 = 
                               c(8.15, 7, 7.12)) %>%
-  gt()
+  gt() %>%
+  tab_header(title = "Standard Deviations: US, CT, FC",
+             subtitle = "FC has largest sd")
+
+comparative_sd
 
   
 ```
@@ -110,7 +125,8 @@ ct_acs <- get_acs(geography = "tract",
 ct_joined <- ct_acs %>%
   mutate(tract = as.double(str_sub(GEOID, start = -6))) %>%
   left_join(ct, by = "tract") %>%
-  select(GEOID, county, NAME, tract,gsmn_math_g3_2013, kfr_pooled_pooled_p25) %>%
+  select(GEOID, county, NAME, tract,gsmn_math_g3_2013, kfr_pooled_pooled_p25,
+         national_rank_education, national_rank_mobility) %>%
   filter(county == 1) %>%
   mutate(dot_color = as_factor(case_when(tract == 70300 ~ "Westside, Bridgeport",
                             tract == 35400 ~ "New Canaan",
@@ -132,6 +148,8 @@ school_fc <- ct_joined %>%
   labs(title = "Absolute mobility p25 vs. 3rd Grade Test Scores") +
   theme_clean()
 
+school_fc
+
 fc_limited <- fc %>%
   select(czname, tract, gsmn_math_g3_2013, kfr_pooled_pooled_p25) %>%
   arrange(gsmn_math_g3_2013) %>%
@@ -149,8 +167,19 @@ ct_joined %>%
   ggplot(aes(fill = gsmn_math_g3_2013)) +
   geom_sf() +
   scale_fill_viridis(option = "B") +
+  labs(title = "Fairfield County 3rd Grade Test Scores") +
   theme_void()
 
 # bridgeport and Danbury have the worst it looks like
+```
+
+## regressions
+
+```{r results = "asis"}
+
+mod_1 <- lm(kfr_pooled_pooled_p25 ~ gsmn_math_g3_2013, data = fc)
+
+stargazer(mod_1,
+          type = "latex")
 ```
 

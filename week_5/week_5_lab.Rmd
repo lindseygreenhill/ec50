@@ -1,0 +1,99 @@
+---
+title: "week_5_lab"
+author: "Lindsey Greenhill"
+date: "3/25/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(haven)
+library(rdrobust)
+library(sandwich)
+library(lmtest)
+
+data <- read_dta("probation.dta")
+```
+
+## Question 1
+
+We don't waant to compare all students who are on probation with all students who arae not on probation because the students at the top end of the gpa theshold are different in many aspects than students at the bottom end of the gpa theshold. As such, the underlying assumption that the control and treatment groups are comparable would not hold. 
+
+## Question 2
+
+The running variable is gpa average
+
+## Question 3
+
+### Part a
+
+The graphs below check the smoothness of fraction graduating in 4 years, male,
+and high school grade precentage. There doesn't appear to be a large break in
+any of these variables at the GPA threshold, meaning that it doesn't seem like
+any of these factors are driving the differences in the groups.
+
+```{r echo=FALSE}
+
+data$dist_from_cut <- data$GPA - 1.6
+
+#totcredits_year1, male, and hsgrade_pct
+
+dat_narrow <- data %>%
+  filter(dist_from_cut <=1.2 & dist_from_cut >= -1.2)
+
+rdplot(dat_narrow$gradin4, #outcome variable
+       dat_narrow$dist_from_cut, #running variable
+        p = 1, #p = 1 is linear best fit line. p >= 2 is nonlinear
+        nbins = c(20, 20), #number of bins on each side of threshold
+        binselect = "es", #option to use "equal spaced" binning
+        y.lim = c(0, 0.6), #Set y-axis scale
+        x.label = "Grade Point Average minus 1.6", 
+        y.label = "Fraction Graduating in 4 years",
+       title = "Fraction Graduating in 4 years"
+       )
+
+rdplot(dat_narrow$male, #outcome variable
+       dat_narrow$dist_from_cut, #running variable
+        p = 1, #p = 1 is linear best fit line. p >= 2 is nonlinear
+        nbins = c(20, 20), #number of bins on each side of threshold
+        binselect = "es", #option to use "equal spaced" binning
+        y.lim = c(0, 0.6), #Set y-axis scale
+        x.label = "Grade Point Average minus 1.6", 
+        y.label = "Male",
+       title = "Male"
+       )
+
+rdplot(dat_narrow$hsgrade_pct, #outcome variable
+       dat_narrow$dist_from_cut, #running variable
+        p = 1, #p = 1 is linear best fit line. p >= 2 is nonlinear
+        nbins = c(20, 20), #number of bins on each side of threshold
+        binselect = "es", #option to use "equal spaced" binning
+        x.label = "Grade Point Average minus 1.6", 
+        y.label = "High School Grade Percentage",
+       title = "High School Grade Percentage"
+       )
+
+
+```
+
+### Part b
+
+There doesn't appear to be a spike in the density of observations just above
+the GPA theshold. 
+
+```{r}
+
+ 
+dat_narrow %>%
+  ggplot(aes(x = dist_from_cut,
+             y = ..density..)) +
+  geom_histogram(bins = 200) +
+  labs(title = "Distribution of dist_from_cut",
+       subtitle = "There doesn't appear to be a spike in density
+       just above the cutoff") +
+  theme_classic()
+
+
+```
+
