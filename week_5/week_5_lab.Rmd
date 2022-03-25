@@ -18,7 +18,13 @@ data <- read_dta("probation.dta")
 
 ## Question 1
 
-We don't waant to compare all students who are on probation with all students who arae not on probation because the students at the top end of the gpa theshold are different in many aspects than students at the bottom end of the gpa theshold. As such, the underlying assumption that the control and treatment groups are comparable would not hold. 
+We don't waant to compare all students who are on probation with all students
+who arae not on probation because the students at the top end of the gpa
+theshold are different in many aspects than students at the bottom end of the
+gpa theshold. As such, the underlying assumption that the control and treatment
+groups are comparable would not hold. If these groups are not comparable, then
+it is impossible to tell if other factors besides the probation policy are
+driving differences in outcomes.
 
 ## Question 2
 
@@ -181,7 +187,13 @@ threshold. However, it was not effective at improving their academic outcomes
 when measured with graduation rates. With this being said, the effect (.04) is
 very small, so while we can claim that it is statistically significant, in my
 opinion, it does not seem substantively significant and is certainly not
-deterministic of any one student's academic outcomes.
+deterministic of any one student's academic outcomes. Additionally, there isn't
+really a way to tell if there is manipulation in the running variable, because
+there are lots of spikes in the histogram in question 3. Also, this analysis
+focuses on people right at the gpa theshold. While it is the case that
+the policy has a small effect for those kids, it is possible that the 
+policy could be really effective for kids at the lower end of the GPA 
+spectrum. 
 
 
 
