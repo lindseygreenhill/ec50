@@ -42,17 +42,6 @@ data$dist_from_cut <- data$GPA - 1.6
 dat_narrow <- data %>%
   filter(dist_from_cut <=1.2 & dist_from_cut >= -1.2)
 
-rdplot(dat_narrow$gradin4, #outcome variable
-       dat_narrow$dist_from_cut, #running variable
-        p = 1, #p = 1 is linear best fit line. p >= 2 is nonlinear
-        nbins = c(20, 20), #number of bins on each side of threshold
-        binselect = "es", #option to use "equal spaced" binning
-        y.lim = c(0, 0.6), #Set y-axis scale
-        x.label = "Grade Point Average minus 1.6", 
-        y.label = "Fraction Graduating in 4 years",
-       title = "Fraction Graduating in 4 years"
-       )
-
 rdplot(dat_narrow$male, #outcome variable
        dat_narrow$dist_from_cut, #running variable
         p = 1, #p = 1 is linear best fit line. p >= 2 is nonlinear
@@ -82,9 +71,10 @@ rdplot(dat_narrow$hsgrade_pct, #outcome variable
 There doesn't appear to be a spike in the density of observations just above
 the GPA theshold. 
 
-```{r}
+```{r echo=FALSE}
 
- 
+# creating histogram
+
 dat_narrow %>%
   ggplot(aes(x = dist_from_cut,
              y = ..density..)) +
@@ -96,4 +86,103 @@ dat_narrow %>%
 
 
 ```
+
+
+## Question 4
+
+```{r echo=FALSE}
+
+rdplot(dat_narrow$gradin4, #outcome variable
+       dat_narrow$dist_from_cut, #running variable
+        p = 1, #p = 1 is linear best fit line. p >= 2 is nonlinear
+        nbins = c(20, 20), #number of bins on each side of threshold
+        binselect = "es", #option to use "equal spaced" binning
+        y.lim = c(0, 0.6), #Set y-axis scale
+        x.label = "Grade Point Average minus 1.6", 
+        y.label = "Fraction Graduating in 4 years",
+       title = "Fraction Graduating in 4 years"
+       )
+
+```
+
+## Question 5
+
+```{r echo=FALSE}
+
+# filtering the data
+
+data_left <- data %>%
+  filter(GPA < 1.6, GPA >= .4)
+
+## part a
+
+# regression
+
+mod_1 <- lm(gradin4 ~ GPA, data = data_left)
+
+answer_a <- -.1327 + (1.6*.2333)
+
+## part b
+
+data_right <- data %>%
+  filter(GPA >= 1.6, GPA <= 2.8)
+
+mod_2 <- lm(gradin4 ~ GPA, data = data_right)
+
+answer_b <- -.05917 + (1.6*.21278)
+
+## part c
+
+answer_c <- answer_b - answer_a
+
+```
+
+a) `r answer_a`
+
+b) `r answer_b`
+
+c) The difference between b and a, or the predicted effect = `r answer_c`
+
+## Question 6
+
+```{r echo=FALSE}
+
+#To estimate the discontinuity requires generating some additional variables
+#generate indicator for being above probation threshold
+data$T <- 0
+data$T[which(data$dist_from_cut >= 0)] <- 1
+
+#Generate interaction term for linear
+data$interaction <- data$dist_from_cut*data$T
+
+##Subset data to [-1.2,1.2] with new variables added
+dat_narrow <- subset(data,dist_from_cut<=1.2 & dist_from_cut>=-1.2)
+
+#Estimate regression
+linear <- lm(gradin4 ~ T + dist_from_cut + interaction , data = dat_narrow)
+coeftest(linear, vcov = vcovHC(linear, type="HC1"))
+```
+
+The coefficient for T equals the answer in 5c. 
+
+## Question 7
+
+The standard error for the coefficient = .013. Because .0407 +/- 1.96*.013 does
+not include 0, we can conclude that the effect is statistically significant at
+the 95% confidence level.
+
+## Question 8
+
+Because the effect of the T coeffient is positive and statistically significant,
+we can see that kids who received probation are graduating at a slower rate than
+kids who did not receive probation. As such, we can conclude the school's
+probation policy was effective in a sense that is punished kids below the
+threshold. However, it was not effective at improving their academic outcomes
+when measured with graduation rates. With this being said, the effect (.04) is
+very small, so while we can claim that it is statistically significant, in my
+opinion, it does not seem substantively significant and is certainly not
+deterministic of any one student's academic outcomes.
+
+
+
 
