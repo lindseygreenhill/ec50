@@ -81,7 +81,7 @@ MI <- mobility %>%
          singleparent_share1990,
          frac_coll_plus2000)
 
-MI_um <- 53.3898 + (.3475*5.72) - (68.2430*.226172) + (8.9554*.2515494)
+MI_um <- 52.84 + (.369*5.72) - (65.535*.226172) + (7.717*.2515494)
 
 ```
 
@@ -95,14 +95,14 @@ the starter code and a modified regression with 3 variables.
 ### Part b (check this)
 
 - Using theregression coefficients from the 3 variable model, we can predict the
-upward mobility rate in Milwaukee, WI using the equation y = 53.3898 +
-.3475bowl_per_capita -68.2430singleparent_share1990 + 8.9554frac_coll_plus2000.
+upward mobility rate in Milwaukee, WI using the equation y = 52.84 +
+.369bowl_per_capita -65.535singleparent_share1990 + 7.717frac_coll_plus2000.
 Using this equation, we can predict that Milwaukee has an upward mobility rate
 of **`r MI_um`**.
 
 - To calculate the prediction error, we subtract the prediction calculated
 above from the actual value of Milwaukee's kfr_pooled_pooled_25 variable (
-which is 38.88789). The prediction error = **`r 42.19557 - 38.88789`**
+which is 38.88789). The prediction error = **`r MI_um - 38.88789`**
 
 ### Part c, d, e, f
 
@@ -174,7 +174,6 @@ text(mobilitytree, cex = 0.5)
 # The actual kfr_pooled_pooled_p25 = 38.88. As such, the prediction error =
 # 52.18 - 38.88 = 13.3
 
-MI
 ```
 
 ### Parts c, d, e, f
@@ -201,4 +200,52 @@ rmspe_train_tree <- sqrt(mean(tree_performance_trainset, na.rm=TRUE))
 - The rmspe for the train data = `r rmspe_train_tree`
 
 - The rmspe is higher for the test data than for the training data. 
+
+## Question 6
+
+```{r echo=FALSE}
+#Estimate large tree
+big_tree <-rpart(kfr_pooled_pooled_p25 ~ bowl_per_capita + singleparent_share1990 +
+                   frac_coll_plus2000, 
+             data=train, 
+             maxdepth = 30, 
+             cp=0,  
+             minsplit = 1, 
+             minbucket = 1)
+
+#Visualize the fitted decision tree
+{
+plot(big_tree, margin = 0.2)
+text(big_tree, cex = 0.5)
+}
+
+#Calculate predictions for all rows in test and training samples
+y_test_predictions_big_tree <- predict(big_tree, newdata=test)
+y_train_predictions_big_tree <- predict(big_tree, newdata=train)
+
+#Generate squared prediction errors
+big_tree_performance_testset <- (test$kfr_pooled_pooled_p25 - y_test_predictions_big_tree)^2
+big_tree_performance_trainset <- (train$kfr_pooled_pooled_p25 - y_train_predictions_big_tree)^2
+
+#Report the root mean squared prediction error
+rmspe_test_big_tree <- sqrt(mean(big_tree_performance_testset, na.rm=TRUE))
+rmspe_train_big_tree <- sqrt(mean(big_tree_performance_trainset, na.rm=TRUE))
+
+```
+
+- The rmspe for the test data = `r rmspe_test_big_tree`
+
+- The rmspe for the training data = 0.
+
+- Obviously, the rmspe is larger for the test data than the training data. 
+
+## Question 7
+
+- Training sample: When comparing the rmspe for the three models on the training
+data set, The big decision tree performs best followed by the small decision
+tree and the regression, respectively.
+
+- Test sampleL when comparing the rmspe for the three models on the test data set,
+
+
 
