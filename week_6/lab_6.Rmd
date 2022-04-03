@@ -245,7 +245,7 @@ rmspe_train_big_tree <- sqrt(mean(big_tree_performance_trainset, na.rm=TRUE))
 data set, The big decision tree performs best followed by the small decision
 tree and the regression, respectively.
 
-- Test sampleL when comparing the rmspe for the three models on the test data set,
+- Test sample: when comparing the rmspe for the three models on the test data set,
 
 
 
