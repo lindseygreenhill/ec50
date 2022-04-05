@@ -1,0 +1,257 @@
+---
+title: "lab_7"
+author: "Lindsey Greenhill"
+date: "4/5/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(haven)
+library(randomForest)
+library(rpart)
+library(tidyverse)
+
+atlas_training <- read_dta("atlas_training.dta")
+```
+
+## Question 1
+
+```{r echo=FALSE}
+# Chetty et al. (2020) report the following rank-rank regression pooling all 
+# races and genders: Rank_{kids} =  33.31 + 0.351 *  Rank_{parents}
+# 
+# The average income rank for white parents today is the $57.9$th percentile. 
+# We predict that the average white child will reach the following percentile 
+# when they are adults:
+
+parents_rank <- 57.9
+kids_rank <- 33.31 + 0.351 * parents_rank
+# kids_rank
+
+# For the next generation, the predicted rank for the (average) white grandchild
+# is:
+
+parents_rank = kids_rank
+kids_rank = 33.31 + 0.351 * parents_rank
+# kids_rank
+
+# Now we may want to study the predictions from this model across many 
+# generations: the grandchilden, the great grandchildren, and the 
+# great great grand children, and so on.  We can do this using a loop
+
+generations <- seq(1,7,1) #This is for generations 1 through 7
+
+parents_rank = 57.9 #This is the starting value for the parent's generation
+
+# use a for loop to run the experiment
+for(j in generations){ 
+  #Calculate kid's predicted rank
+  kids_rank <- 33.31 + 0.351 * parents_rank
+  
+  #Print the output to the console
+  print(paste0("In generation ", j, ", parent_rank = ", parents_rank, ", child_rank = ", kids_rank))
+  
+  #Set parent's rank equal to kids' rank so we are ready for the next iteration
+  parents_rank <- kids_rank
+}
+
+# Notice that the model predicts that the average white child will reach the
+# 51.3rd percentile in generation 7, which is lower than where the first 
+# generation started from (which you will recall was the $57.9$th percentile).  
+# This is a reduction of around 6 percentiles.
+# 
+# Meanwhile, the average income rank for Black parents is the 32.7th percentile.
+# If we apply the same rank-rank relationship between Black parents and Black 
+# children that we did above, our model predicts that the average Black child 
+# will reach the 44.9th percentile when they grow up, with further gains for 
+# future generations.
+
+generations <- seq(1,7,1) #This is for generations 1 through 7
+parents_rank = 32.7 #This is the starting value for the parent's generation
+for(j in generations){ 
+  kids_rank <- 33.31 + 0.351 * parents_rank
+  print(paste0("In generation ", j, ", parent_rank = ", parents_rank, ", child_rank = ", kids_rank))
+  parents_rank <- kids_rank
+}
+
+# As you can see, this model predicts substantial improvements in outcomes for
+# Black children across generations, with average gains of 12 percentiles in a 
+# single generation.  The model makes the unrealistic prediction of convergence
+# in outcomes across racial groups: By generation 7, both white and Black children
+# are at the 51.3 percentile.  This result is unrealistic because racial disparities have persisted for many generations in the United States.
+# 
+# However, the model is incorrect: we know from Lab 2 and Lecture that Black 
+# children and white children experience very different rates of upward mobility 
+# across generations. In particular, Chetty et al. (2020) report the following 
+# rank-rank regression for Black children:
+# 
+# Rank_{kids} =  25.4 + 0.28 *  Rank_{parents}
+# 
+# The prediction implied by this rank-rank graph is very different than the 
+# previous calculations suggested.  To see this, in the first generation this 
+# model predicts:
+
+parents_rank = 32.7
+kids_rank = 25.4 + 0.28 * parents_rank
+# kids_rank
+
+# In stark contrast to the predictions from the calculations earlier, here 
+# there is hardly any predicted improvement in the income rank for Black children
+# in generation 1.  To see what happens across generations, we can update our 
+# loop:
+
+generations <- seq(1,7,1) #This is for generations 1 through 7
+parents_rank = 32.7 #This is the starting value for the parent's generation
+for(j in generations){ 
+  kids_rank = 25.4 + 0.28 * parents_rank
+  print(paste0("In generation ", j, ", parent_rank = ", parents_rank, ", child_rank = ", kids_rank))
+  parents_rank <- kids_rank
+}
+
+# As you can see, the income rank hardly improves at all for the second and 
+# third generation, and eventually stabilizes after four generations at the 
+# 35.3rd percentile. The 35.3rd percentile is the steady state (or fixed point)
+# prediction for Black children, because the model predicts no further 
+# improvement once average income reaches this level. 
+# 
+# In contrast, similar calculations would show that the 54.2nd percentile 
+# is the steady state (or fixed point) of the model for white children. 
+# These stark steady state gaps show that addressing racial disparities in 
+# upward mobility is crucial for lessening racial disparities in the United States. 
+# 
+# ## Trying it on your own
+# 
+# Chetty, Hendren, Jones, and Porter (2020) report the following estimates 
+# for Hispanic children: 
+# 
+# Rank_{kids} =  36.14 + 0.26 *  Rank_{parents}
+# 
+# The average income rank for Hispanic parents is the 36.17th percentile.  
+#
+# Write your own for loop to study the predictions from the model for Hispanic 
+# children over the next 7 generations.
+
+generations <- seq(1,7,1) #This is for generations 1 through 7
+parents_rank = 36.17 #This is the starting value for the parent's generation
+for(j in generations){ 
+  kids_rank = 36.14 + 0.26 * parents_rank
+  print(paste0("In generation ", j, ", parent_rank = ", parents_rank, ", child_rank = ", kids_rank))
+  parents_rank <- kids_rank
+}
+# Using the output from your for loop, what is the steady state prediction for 
+# Hispanic children?
+
+
+```
+
+The steady state prediction for Hispanic children is 48.8
+
+## Question 2
+
+Cross Validation helps avoid the overfit problem by allowing you to test
+different levels of tree complexities on data you didn't use to create the model
+and allows you to systematically select the level of complexity that minimizes
+out of sample prediction error.
+
+## Question 3
+
+### Part a
+I am using P_26 -- fraction of residents with a college degree or more in 2000 and
+P_55 (physically unhealthy days per month)
+
+```{r echo=FALSE}
+#Open stata data set
+
+
+#Store predictor variables which all start with P_*
+vars <- colnames(atlas_training[,grep("^[P_]", names(atlas_training))])
+
+
+#Data frame with just predictors P_* and kfr_pooled_pooled_p25
+training <- subset(atlas_training, training==1, vars)
+training$kfr_pooled_pooled_p25 <- atlas_training[atlas_training$training==1,]$kfr_pooled_pooled_p25
+
+
+#-------------------------------------------------------------------------------
+# Part 1: Decision tree with cross validation and two hand picked predictors
+#-------------------------------------------------------------------------------
+
+# Implement five-fold cross validation to choose the depth of a decision tree 
+# that uses two of the predictors (your choice which predictors). Plot the 
+# cross-validation out of sample root mean squared prediction error (CV RMSE) 
+# versus the depth of the tree.
+
+# Modify the code to change from 10 fold cross validation to 5
+# and change the predictors that I use to two others of your choice
+
+##Illustrate cross validation##
+#K-fold Cross validation to select tree depth
+# setup the experiment
+n <- nrow(training) # the number of observations
+K <- 5 # the number of `folds'
+
+# create a copy of the training data
+cv <- training
+
+# create a vector of fold memberships (random order)
+cv$foldid <- rep(1:K,each=ceiling(n/K))[sample(1:n)]
+
+# create an empty data frame of results
+B <- seq(1,20,1) #This is for depths for 1 to 20
+OOS <- data.frame(fold=rep(NA,K*length(B) ), squarederror=rep(NA,K*length(B) ), maxdepth=rep(NA,K*length(B) )) 
+
+# use a for loop to run the experiment
+row <- 0
+for(j in B){ 
+  for(k in 1:K){ 
+    row <- row + 1
+    cvtrain <- subset(cv, foldid != k) # train on all but fold `k'
+    cvfold <- subset(cv, foldid == k) # fold `k'
+    
+    # Fit tree on all but fold `k'
+    cvtree <- rpart(kfr_pooled_pooled_p25 ~ P_26 + P_55,
+                    data=cvtrain, 
+                    maxdepth = c(j), 
+                    cp=0) 
+    
+    
+    #Get predictions for fold `k'
+    predfull <- predict(cvtree, newdata=cvfold) # Get predictions for fold `k'
+    
+    #Calculate sum of squred errors for obs in fold `k'
+    OOS$squarederror[row] <- sum((cvfold$kfr_pooled_pooled_p25 - predfull)^2) # Calculate prediction errors for fold `k'
+    
+    OOS$maxdepth[row] <- j # store the maxdepth
+    
+    OOS$fold[row] <- k # store the fold
+    
+  }
+}
+
+#Summarize the results
+# OOS
+# summary(OOS)
+
+#Calculate the combined error across folds
+ssr <- tapply(OOS$squarederror, OOS$maxdepth, sum)
+ssr <- as.data.frame(ssr)
+ssr$maxdepth <- seq(1,20,1)
+
+#Calculate the CV RMSE
+ssr$rmse <- sqrt(ssr$ssr / nrow(training))
+
+#Display sum across folds for each bandwidth
+ggplot(ssr, aes(x=maxdepth,y=rmse)) +
+  geom_point() +
+  geom_line() +
+  labs(y = "Cross Validation RMSE",
+       x = "Tree Depth") +
+  labs(title = "Tree Complexity Selection") +
+  theme_classic()
+
+```
+
+
+
