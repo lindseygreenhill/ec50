@@ -351,10 +351,10 @@ y_train_predictions_forest  <- predict(mobilityforest, newdata=training, type="r
 
 ## Question 7
 
-Looking at the graph below, the 5 most important predictors appear to be P_57 (%
-of adults that report fair or poor health), P_37(share black in 2000), P_56
-(mentally unhealthy days per month), P_45 (share of single headed households
-with children 2000), and P_85 (% total: roman catholic)
+Looking at the graph below, the 5 most important predictors appear to be
+P_37(share black in 2000), P_57 (% of adults that report fair or poor health),
+P_56 (mentally unhealthy days per month), P_45 (share of single headed
+households with children 2000), and P_85 (% total: roman catholic)
 
 ```{r echo=FALSE}
 
