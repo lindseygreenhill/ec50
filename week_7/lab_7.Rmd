@@ -253,5 +253,98 @@ ggplot(ssr, aes(x=maxdepth,y=rmse)) +
 
 ```
 
+### Part b
+
+Using the graph above, a tree depth of 4 is optimal
+
+### Part c
+
+P_37 (share black in 2000) and P_56 (mentally unhealthy days per month) are
+being used in the first few splits in the tree
+
+```{r echo=FALSE}
+cv_optimal_depth = 4
+
+### Modify this example code to estimate tree using the depth you chose above 
+### using the full training data
+tree <- rpart(kfr_pooled_pooled_p25 ~ P_37 + P_56, 
+                      data=training, 
+                      maxdepth = cv_optimal_depth, 
+                      cp=0) 
+
+
+#Visualize the fitted decision tree
+{
+plot(tree, margin = 0.2)
+text(tree, cex = 0.5)
+}
+
+```
+
+### Part d
+
+```{r echo=FALSE}
+#Calculate predictions for all rows in training sample
+y_train_predictions_tree <- predict(tree, newdata=training)
+```
+
+## Question 4
+
+Random forests improve upon decision using bagging because it allows you to take
+the average of many different decision trees to find the optimal one and
+eliminates the "noise" of the individual models. Random forests use input
+randomization to decrease the correlation between the predictions of the trees.
+
+## Question 5
+
+```{r echo=FALSE}
+
+#Random Forest from 1000 Bootstrapped Samples (ntree=100)
+#Random Forests may take a while to run!  Be patient!
+smallforest <- randomForest(kfr_pooled_pooled_p25 ~ P_26 + P_55, 
+                               ntree=1000, 
+                               mtry=2,
+                               data=training)
+
+#Tuning parameters are ntree and mtry
+#ntree is number of trees in your forest
+#mtry is the number of predictors considered at each split (default is number of predictors divided by 3)
+
+smallforest #Review the Random Forest Results
+
+#Generate predictions for training data
+y_train_predictions_smallforest <- predict(smallforest, newdata=training, type="response")
+
+```
+
+
+## Question 6
+
+```{r echo=FALSE}
+
+#Random Forest from 1000 Bootstrapped Samples (ntree=100)
+#Random Forests may take a while to run!  Be patient!
+mobilityforest <- randomForest(kfr_pooled_pooled_p25 ~ ., 
+                               ntree=1000, 
+                               mtry=121,
+                               importance=TRUE, ## add importance=TRUE so that we store the variable importance information
+                               data=training)
+
+#Tuning parameters are ntree and mtry
+#ntree is number of trees in your forest
+#mtry is the number of predictors considered at each split (default is number of predictors divided by 3)
+#Setting mtry<121 can help in small samples like this one.
+
+mobilityforest #Review the Random Forest Results
+
+#Generate predictions for training data
+y_train_predictions_forest  <- predict(mobilityforest, newdata=training, type="response")
+
+### Try changing mtry to 20 (16.5% of predictors), 60 (50% of predictors), or 121 (all predictors)
+
+```
+
+
+
 
 
