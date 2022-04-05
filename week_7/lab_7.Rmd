@@ -14,6 +14,8 @@ library(rpart)
 library(tidyverse)
 
 atlas_training <- read_dta("atlas_training.dta")
+#Read in data with truth. Truth is kfr_actual in these data
+atlas_test <- read_dta("atlas_lockbox.dta")
 ```
 
 ## Question 1
@@ -344,6 +346,76 @@ y_train_predictions_forest  <- predict(mobilityforest, newdata=training, type="r
 
 ```
 
+
+\newpage
+
+## Question 7
+
+Looking at the graph below, the 5 most important predictors appear to be P_57 (%
+of adults that report fair or poor health), P_37(share black in 2000), P_56
+(mentally unhealthy days per month), P_45 (share of single headed households
+with children 2000), and P_85 (% total: roman catholic)
+
+```{r echo=FALSE}
+
+# importance(mobilityforest)
+
+varImpPlot(mobilityforest, type=1) #Plot the Random Forest Results
+
+#type	is either 1 or 2, specifying the type of importance measure 
+#(1=mean decrease in accuracy, 2=mean decrease in node impurity)
+
+```
+
+\newpage
+
+## Question 8
+
+The large random forest does best, followed by the small random foreest and the
+individual tree, respectively
+
+```{r echo=FALSE}
+
+## Root mean squared prediction error in  the training sample.
+p <- 3
+RMSPE <- matrix(0, p, 1)
+RMSPE[1] <- sqrt(mean((training$kfr_pooled_pooled_p25 - y_train_predictions_tree)^2, na.rm=TRUE))
+RMSPE[2] <- sqrt(mean((training$kfr_pooled_pooled_p25 - y_train_predictions_smallforest)^2, na.rm=TRUE))
+RMSPE[3] <- sqrt(mean((training$kfr_pooled_pooled_p25 - y_train_predictions_forest)^2, na.rm=TRUE))
+
+#Display a table of the results
+data.frame(RMSPE, method = c("Tree", "Small RF", "Large RF"))  
+
+```
+## Question 9
+
+The large random forest does best, followed by the individual tree and small
+random forest, respectively.
+
+```{r echo=FALSE}
+
+
+#Merge with truth to evaluate predictions. 
+atlas <- left_join(atlas_test, atlas_training , by="geoid")
+
+#Separate test data set as a separate data frame
+test <- subset(atlas, training==0)
+
+#Get predictions for test data
+y_test_predictions_tree <- predict(tree, newdata=test)
+y_test_predictions_smallforest <- predict(smallforest, newdata=test, type="response")
+y_test_predictions_forest  <- predict(mobilityforest, newdata=test, type="response")
+
+#Calculate RMSPE for test data
+p <- 3
+OOS_RMSPE <- matrix(0, p, 1)
+OOS_RMSPE[1] <- sqrt(mean((test$kfr_actual - y_test_predictions_tree)^2, na.rm=TRUE))
+OOS_RMSPE[2] <- sqrt(mean((test$kfr_actual - y_test_predictions_smallforest)^2, na.rm=TRUE))
+OOS_RMSPE[3] <- sqrt(mean((test$kfr_actual - y_test_predictions_forest)^2, na.rm=TRUE))
+
+# Display table of results
+data.frame(OOS_RMSPE, method = c("Tree", "Small RF", "Large RF"))  
+```
 
 
 
