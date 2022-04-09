@@ -162,3 +162,22 @@ ggarrange(bin_index_ses,
 
 ## Question 7
 
+As we can see from the binned scatter plots above, the socio economic
+index variable is correlated with both class size and test score index.
+As such, it is a counfounding variable and mean we cannot interpret 
+the relationship between class size and test scores causally because
+it is likely that a student's socioeconomic status influences both 
+outcomes, meaning that we don't know how greatly class size affects
+test scores versus ses affects test scores.
+
+## Question 8
+
+```{r echo=FALSE}
+
+narrow <- data %>%
+  filter(school_enrollment <= 80)
+```
+
+
+
+
