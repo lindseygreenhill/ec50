@@ -342,13 +342,39 @@ stargazer(mod_classsize, mod_testscore,
           type = "latex")
 
 
-# coeftest(rd41, vcov = vcovHC(rd41, type="HC1")) 
+
 ```
 - For the test score model, the estimate of the discontinuity
 at the 41 threshold = .026. 
 
 - For the class size model, the estimate of the discontinuity
 at the 41 threshold = -16.6
+
+## Question 12
+
+- Class size model: The 95% confidence interval for the above41 estimate = [-18.38, -14.8]. Because the CI does not include 0, we can
+conclude that the results are statistically significant from 0 at the 95% confidence level
+
+- Test score model: The 95% confidence interval for the above41 estimate = [-.14, .19]. Because the CI includes 0, we can
+conclude that the results are not statistically significant from 0 at the 95% confidence level
+
+```{r echo=FALSE}
+
+# class size
+
+cs_test <- coeftest(mod_classsize, vcov = vcovHC(mod_classsize, type="HC1")) 
+
+lb_cs <- -16.6 - (1.96*.912)
+ub_cs <- -16.6 + (1.96*.912)
+
+# test score
+
+ts_test <- coeftest(mod_testscore, vcov = vcovHC(mod_testscore, type="HC1")) 
+
+lb_ts <- .026 - (1.96*.083)
+ub_ts <- .026 + (1.96*.083)
+```
+
 
 
 
