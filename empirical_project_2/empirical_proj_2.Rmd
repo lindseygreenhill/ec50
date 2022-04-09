@@ -15,6 +15,7 @@ library(statar)
 library(vtable)
 library(ggthemes)
 library(sandwich)
+library(stargazer)
 library(ggpubr)
 library(lmtest)
 
@@ -285,13 +286,13 @@ different in this way.
 ```{r echo=FALSE, message=FALSE}
 
 # aggregating data by school
-by_school <- data %>%
+schools <- data %>%
   group_by(schlcode) %>%
   summarise(enrollment = mean(school_enrollment),
             avg_class_size = mean(class_size, na.rm = T),
             avg_test_score_index = mean(test_score_index, na.rm = T))
 
-by_school %>%
+schools %>%
   ggplot(aes(x = enrollment),
          y = ..density..) +
   geom_histogram(binwidth = 1) +
@@ -309,6 +310,45 @@ off in enrollment right at the 81 threshold line. As such, it certainly seems
 possible that there was manipulation in enrollment, but there are conflicting
 behvaviors at the two cutoffs. There doesn't appear to be any spike at the 121
 line.
+
+## Question 11
+
+```{r echo=FALSE, results="asis"}
+
+# creating running variable, centered at 41
+
+schools$dist_from_41 <- schools$enrollment - 41
+
+# create indicator for being over threshold
+
+schools$above41 <- 0
+
+schools$above41[which(schools$enrollment >= 41)] <- 1 
+
+schools$interaction41 <- schools$dist_from_41* schools$above41 
+
+school_narrow <- schools %>%
+  filter(enrollment <= 80)
+
+# regressions
+
+mod_classsize <- lm(avg_class_size ~ above41 + dist_from_41 + interaction41 , data = school_narrow) 
+
+mod_testscore <- lm(avg_test_score_index ~ above41 + dist_from_41 + interaction41 , data = school_narrow) 
+
+# displaying regressions
+
+stargazer(mod_classsize, mod_testscore,
+          type = "latex")
+
+
+# coeftest(rd41, vcov = vcovHC(rd41, type="HC1")) 
+```
+- For the test score model, the estimate of the discontinuity
+at the 41 threshold = .026. 
+
+- For the class size model, the estimate of the discontinuity
+at the 41 threshold = -16.6
 
 
 
