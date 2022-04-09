@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(haven)
 library(rdrobust)
+library(vtable)
 library(sandwich)
 library(lmtest)
 
@@ -39,9 +40,9 @@ The following variables have missing values:
 summary(data)
 ```
 
-## Question 3
+## Questions 3 and 4
 
-```{r}
+```{r echo=FALSE, results = "asis"}
 
 # getting the means
 
@@ -72,5 +73,19 @@ data <- data %>%
                                     if_else(math_miss == 1, verbal_std, math_std),
                                     test_score_index))
 
+
+# summary table
+
+sumtable(data,
+         vars = c("math", "verb", "test_score_index"),
+         summ = c("mean(x)",
+                  "sd(x)",
+                  "min(x)",
+                  "max(x)"),
+         out = "latex")
+
 ```
+
+
+
 
