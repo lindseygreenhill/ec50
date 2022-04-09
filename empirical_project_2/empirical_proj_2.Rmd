@@ -11,6 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(haven)
 library(rdrobust)
+library(statar)
 library(vtable)
 library(ggthemes)
 library(sandwich)
@@ -129,5 +130,35 @@ ggarrange(hist_math,
 
 ```
 
+## Question 6
 
+```{r echo=FALSE, warning = FALSE}
+
+# creating binned scatter plots
+
+bin_index_ses <- data %>%
+  ggplot(aes(x = ses_index, y = test_score_index)) +
+  stat_binmean(n = 20, geom = "point") +
+  labs(title = "Test Score Index vs. SES Index") +
+  theme_classic()
+
+bin_class_ses <- data %>%
+  ggplot(aes(x = ses_index, y = class_size)) +
+  stat_binmean(n = 20, geom = "point") +
+  labs(title = "Class Size vs. SES Index") +
+  theme_classic()
+  
+bin_index_class <- data %>%
+  ggplot(aes(x = class_size, y = test_score_index)) +
+  stat_binmean(n = 20, geom = "point") +
+  labs(title = "Test Score Index vs. Class Size") +
+  theme_classic()
+
+ggarrange(bin_index_ses,
+          bin_class_ses,
+          bin_index_class)
+
+```
+
+## Question 7
 
