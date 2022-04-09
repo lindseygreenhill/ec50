@@ -12,7 +12,9 @@ library(tidyverse)
 library(haven)
 library(rdrobust)
 library(vtable)
+library(ggthemes)
 library(sandwich)
+library(ggpubr)
 library(lmtest)
 
 data <- read_dta("third_grade.dta")
@@ -86,6 +88,46 @@ sumtable(data,
 
 ```
 
+## Question 5
+
+All of the histograms appear to not by symmetrical and all of them have a long
+left tail.
+
+```{r echo=FALSE, warning = FALSE}
+
+# math hist
+
+hist_math <- data %>%
+  ggplot(aes(x = math,
+             y = ..density..)) +
+  geom_histogram(binwidth = 1) +
+  labs(title = "Distribution of Math Scores") +
+  theme_clean()
+
+
+# verbal hist
+
+hist_verb <- data %>%
+  ggplot(aes(x = verb,
+             y = ..density..)) +
+  geom_histogram(binwidth = 1) +
+  labs(title = "Distribution of Verbal Scores") +
+  theme_clean()
+
+# index hist
+
+hist_index <- data %>%
+  ggplot(aes(x = test_score_index,
+             y = ..density..)) +
+  geom_histogram(binwidth = .25) +
+  labs(title = "Distribution of Test Score Index") +
+  theme_clean()
+
+ggarrange(hist_math,
+          hist_verb,
+          hist_index)
+
+```
 
 
 
