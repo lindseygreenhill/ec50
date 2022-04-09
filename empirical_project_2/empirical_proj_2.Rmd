@@ -227,7 +227,7 @@ rdplot(narrow$test_score_index,
 ```{r echo=FALSE}
 # religious, boy (with test score index), born_isr
 
-by_school <- data %>%
+by_school_narrow <- data %>%
   group_by(schlcode) %>%
   mutate(avg_boy = mean(boy, na.rm = T),
          avg_religious = mean(religious, na.rm = T),
@@ -236,8 +236,8 @@ by_school <- data %>%
 
 # there doesn't appear to be a significant gap in % boys
 
-rdplot(by_school$avg_boy,
-       by_school$school_enrollment,
+rdplot(by_school_narrow$avg_boy,
+       by_school_narrow$school_enrollment,
        c = 41,
        p = 1,
        nbins = c(20,20),
@@ -249,8 +249,8 @@ rdplot(by_school$avg_boy,
 
 # there doesn't appear to be a significant gap in % borrn in isr
 
-rdplot(by_school$avg_born_isr,
-       by_school$school_enrollment,
+rdplot(by_school_narrow$avg_born_isr,
+       by_school_narrow$school_enrollment,
        c = 41,
        p = 1,
        nbins = c(20,20),
@@ -271,6 +271,44 @@ random. The graphs from part a above are consistent with this identification
 assumption, as schools just at either side of the cutoff do not seem to have
 different percentages of boys or kids born in Israel enrolled.
 
+## Question 10
+
+### Part a
+
+Manipulation of school enrollment could possibly invalidate the identification assumption because it means that schools could
+intentially stay right below the discontinuity cutoff, meaning
+that the schools on either side of the cutoff would be 
+different in this way. 
+
+### Parts b, c, and d
+
+```{r echo=FALSE, message=FALSE}
+
+# aggregating data by school
+by_school <- data %>%
+  group_by(schlcode) %>%
+  summarise(enrollment = mean(school_enrollment),
+            avg_class_size = mean(class_size, na.rm = T),
+            avg_test_score_index = mean(test_score_index, na.rm = T))
+
+by_school %>%
+  ggplot(aes(x = enrollment),
+         y = ..density..) +
+  geom_histogram(binwidth = 1) +
+  labs(title = "Distribution of Total School Enrollment",
+       subtitle = "Red lines aat 41, 81, and 121") +
+  geom_vline(xintercept = 41, col = "red") +
+  geom_vline(xintercept = 81, col = "red") +
+  geom_vline(xintercept = 121, col = "red")+
+  theme_classic()
+```
+
+Looking at the histogram above, it seems like there is a spike in enrollment
+number right after the break at 41. However, there seems to be a drastic drop
+off in enrollment right at the 81 threshold line. As such, it certainly seems
+possible that there was manipulation in enrollment, but there are conflicting
+behvaviors at the two cutoffs. There doesn't appear to be any spike at the 121
+line.
 
 
 
