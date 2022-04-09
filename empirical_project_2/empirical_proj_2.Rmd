@@ -172,11 +172,106 @@ test scores versus ses affects test scores.
 
 ## Question 8
 
+### Part a
+
+I chose a quadratic model it seems to fit the data better than a linear model,
+especiaally for the data to the left of the break
+
 ```{r echo=FALSE}
 
 narrow <- data %>%
   filter(school_enrollment <= 80)
+
+# I chose a quadratic because it seems to fit the data better, especially for
+# the data to the left of the break
+
+rdplot(narrow$class_size,
+       narrow$school_enrollment,
+       c = 41,
+       p = 2,
+       nbins = c(20,20),
+       y.lim = c(0, 40),
+       binselect = "es",
+       title = "Class size vs. total school enrollment",
+       x.label = "Total School Enrollment in 3rd Grade",
+       y.label = "Class Size")
 ```
+
+### Part b
+
+I chose to use a linear model because it seems to fit the data better than a
+quadrtatic model. When I chose a quadrataic model, it seemed like residuals on
+the right side of the break were much more in the positive than the negative,
+which would be bad. Looking at the graph, it doesn't seem like there is a wide
+gap in schools with 40 kids and schools with 41 kids enrolled. 
+
+```{r echo=FALSE}
+
+# switching the varibale from above
+rdplot(narrow$test_score_index,
+       narrow$school_enrollment,
+       c = 41,
+       p = 1,
+       nbins = c(20,20),
+       y.lim = c(-.75, .5),
+       binselect = "es",
+       title = "Test Score Index vs. Total School Enrollment",
+       x.label = "Total School Enrollment in 3rd Grade",
+       y.label = "Test Score Index")
+```
+
+## Question 9
+
+### Part a
+
+```{r echo=FALSE}
+# religious, boy (with test score index), born_isr
+
+by_school <- data %>%
+  group_by(schlcode) %>%
+  mutate(avg_boy = mean(boy, na.rm = T),
+         avg_religious = mean(religious, na.rm = T),
+         avg_born_isr = mean(born_isr, na.rm = T)) %>%
+  filter(school_enrollment <= 80)
+
+# there doesn't appear to be a significant gap in % boys
+
+rdplot(by_school$avg_boy,
+       by_school$school_enrollment,
+       c = 41,
+       p = 1,
+       nbins = c(20,20),
+       y.lim = c(0, 1),
+       binselect = "es",
+       title = "% Boys vs. Total School Enrollment",
+       x.label = "Total School Enrollment in 3rd Grade",
+       y.label = "% Boys")
+
+# there doesn't appear to be a significant gap in % borrn in isr
+
+rdplot(by_school$avg_born_isr,
+       by_school$school_enrollment,
+       c = 41,
+       p = 1,
+       nbins = c(20,20),
+       y.lim = c(.5, 1.2),
+       binselect = "es",
+       title = "% Born in Isr vs. Total School Enrollment",
+       x.label = "Total School Enrollment in 3rd Grade",
+       y.label = "% Born in Isr")
+
+```
+
+### Part b
+
+The identification assumption for the regression discontinuity design is 
+that schools on either side of the cutoff are similar in all ways and as such
+the fact that they have school enrollment over or under the cutoff is as if
+random. The graphs from part a above are consistent with this identification
+assumption, as schools just at either side of the cutoff do not seem to have
+different percentages of boys or kids born in Israel enrolled.
+
+
 
 
 
