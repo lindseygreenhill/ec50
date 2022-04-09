@@ -1,0 +1,76 @@
+---
+title: "empirical_proj_2"
+author: "Lindsey Greenhill"
+date: "4/9/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(haven)
+library(rdrobust)
+library(sandwich)
+library(lmtest)
+
+data <- read_dta("third_grade.dta")
+```
+
+## Question 1
+
+The fundamental problem of causal inference is that you cannot see the outcome
+for a child who both was in a small class and not in a small class. In other
+words, it is impossible to measure the dual outcomes when a child both is in a
+small class and not in a small class, because the child can only either be in a
+small class or not in a small class.
+
+## Question 2
+
+The following variables have missing values:
+
+- towncode: 318 missing
+- math: 58 missing
+- verb: 466 missing
+- ses_index: 318 missing
+- boy: 1037 missing
+
+```{r echo=FALSE}
+summary(data)
+```
+
+## Question 3
+
+```{r}
+
+# getting the means
+
+math_mean <- mean(data$math, na.rm = T)
+verb_mean <- mean(data$verb, na.rm = T)
+
+# getting the sds
+
+math_sd <- sd(data$math, na.rm = T)
+verb_sd <- sd(data$verb, na.rm = T)
+
+# standardizing
+
+data$math_std <- (data$math - math_mean) / math_sd
+data$verbal_std <- (data$verb - verb_mean) / verb_sd
+
+# creating test score index
+
+data <- data %>%
+  mutate(test_score_index = .5 * (math_std + verbal_std)) %>%
+  mutate(math_miss = if_else(is.na(math),
+                             1,
+                             0),
+         verb_miss = if_else(is.na(verb),
+                                1,
+                                0)) %>%
+  mutate(test_score_index = if_else(is.na(test_score_index),
+                                    if_else(math_miss == 1, verbal_std, math_std),
+                                    test_score_index))
+
+```
+
