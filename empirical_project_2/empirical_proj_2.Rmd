@@ -375,6 +375,68 @@ lb_ts <- .026 - (1.96*.083)
 ub_ts <- .026 + (1.96*.083)
 ```
 
+## Question 13 and 14
+
+```{r echo=FALSE, results = "asis"}
+
+#First threshold is when wvar is less than or equal to 61 
+schools$dist_from_cut <- ifelse(schools$enrollment <= 61,  
+                                schools$enrollment - 41, 
+                                NA) 
+ 
+#Next threshold is when wvar is above 61 and less than or equal to 101 
+schools$dist_from_cut <- ifelse(schools$enrollment > 61 & schools$enrollment <= 101, 
+                                schools$enrollment - 81, 
+                                schools$dist_from_cut) 
+ 
+#Next threshold is when wvar is above 101 and less than or equal to 141 
+schools$dist_from_cut <- ifelse(schools$enrollment > 101 & schools$enrollment <= 141, 
+                                schools$enrollment - 121, 
+                                schools$dist_from_cut) 
+ 
+#Last threshold is when wvar is above 141 
+schools$dist_from_cut <- ifelse(schools$enrollment > 141, 
+                                schools$enrollment - 161, 
+                                schools$dist_from_cut) 
+
+# summary of variable
+
+sumtable(schools,
+         vars = c("dist_from_cut"),
+         summ = c("mean(x)",
+                  "sd(x)",
+                  "min(x)",
+                  "max(x)"),
+         out = "latex")
+
+# class size vs. dist from cut
+
+rdplot(schools$avg_class_size,
+       schools$dist_from_cut,
+       c = 0,
+       p = 1,
+       nbins = c(20,20),
+       y.lim = c(0, 50),
+       binselect = "es",
+       title = "Class Size vs. Dist from Cut",
+       x.label = "Distance from Cut",
+       y.label = "Class Size")
+
+# test score index vs dist from cut
+
+rdplot(schools$avg_test_score_index,
+       schools$dist_from_cut,
+       c = 0,
+       p = 1,
+       nbins = c(20,20),
+       y.lim = c(-.5, .5),
+       binselect = "es",
+       title = "Test Score Index vs. Dist from Cut",
+       x.label = "Distance from Cut",
+       y.label = "Test Score Index")
+
+```
+
 
 
 
