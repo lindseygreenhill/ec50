@@ -375,9 +375,11 @@ lb_ts <- .026 - (1.96*.083)
 ub_ts <- .026 + (1.96*.083)
 ```
 
-## Question 13 and 14
+## Question 13 
 
-```{r echo=FALSE, results = "asis"}
+\newpage
+
+```{r echo=FALSE, results = "asis", message=FALSE, warning=FALSE}
 
 #First threshold is when wvar is less than or equal to 61 
 schools$dist_from_cut <- ifelse(schools$enrollment <= 61,  
@@ -409,9 +411,19 @@ sumtable(schools,
                   "max(x)"),
          out = "latex")
 
+
+
+```
+
+\newpage
+
+## Question 14
+
+```{r warning=FALSE, message=FALSE, echo=FALSE}
+
 # class size vs. dist from cut
 
-rdplot(schools$avg_class_size,
+cs_dc <- rdplot(schools$avg_class_size,
        schools$dist_from_cut,
        c = 0,
        p = 1,
@@ -424,7 +436,7 @@ rdplot(schools$avg_class_size,
 
 # test score index vs dist from cut
 
-rdplot(schools$avg_test_score_index,
+ts_dc <- rdplot(schools$avg_test_score_index,
        schools$dist_from_cut,
        c = 0,
        p = 1,
@@ -436,6 +448,43 @@ rdplot(schools$avg_test_score_index,
        y.label = "Test Score Index")
 
 ```
+
+
+## Question 15
+
+- The estimated discontinuity for the class size model = -14.202.
+
+- The estimated discontinuity for the test score model = -.008
+
+```{r echo=FALSE, warning=FALSE, results = "asis"}
+
+# creating regression terms
+
+schools$above_cut <- 0
+
+schools$above_cut[which(schools$dist_from_cut >= 0)] <- 1 
+
+schools$interaction_cut <- schools$dist_from_cut* schools$above_cut 
+
+# narrowing data set
+
+schools_15 <- schools %>%
+  filter(dist_from_cut <= 20,
+         dist_from_cut >= -20)
+
+# regression 
+
+mod_class_size15 <- lm(avg_class_size ~ above_cut + dist_from_cut + interaction_cut, data = schools_15)
+
+mod_test_score15 <- lm(avg_test_score_index ~ above_cut + dist_from_cut + interaction_cut, data = schools_15)
+
+stargazer(mod_class_size15,
+          mod_test_score15,
+          type = "latex")
+
+```
+
+
 
 
 
