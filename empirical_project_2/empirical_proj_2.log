@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.30)  10 APR 2022 14:09
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2021) (preloaded format=pdflatex 2021.4.30)  10 APR 2022 14:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -706,16 +706,16 @@ LaTeX Font Info:    External font `lmex10' loaded for size
 
 {/Users/lindseygreenhill/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdft
 ex.map}]
-<empirical_proj_2_files/figure-latex/unnamed-chunk-3-1.pdf, id=98, 469.755pt x 
-325.215pt>
+<empirical_proj_2_files/figure-latex/unnamed-chunk-3-1.pdf, id=102, 469.755pt x
+ 325.215pt>
 File: empirical_proj_2_files/figure-latex/unnamed-chunk-3-1.pdf Graphic file (t
 ype pdf)
 <use empirical_proj_2_files/figure-latex/unnamed-chunk-3-1.pdf>
 Package pdftex.def Info: empirical_proj_2_files/figure-latex/unnamed-chunk-3-1.
 pdf  used on input line 163.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<empirical_proj_2_files/figure-latex/unnamed-chunk-4-1.pdf, id=99, 469.755pt x 
-325.215pt>
+<empirical_proj_2_files/figure-latex/unnamed-chunk-4-1.pdf, id=103, 469.755pt x
+ 325.215pt>
 File: empirical_proj_2_files/figure-latex/unnamed-chunk-4-1.pdf Graphic file (t
 ype pdf)
 <use empirical_proj_2_files/figure-latex/unnamed-chunk-4-1.pdf>
@@ -729,7 +729,7 @@ as been already used, duplicate ignored
 l.171 \subsection{Question 7}\label{question-7}}
                                                  <./empirical_proj_2_files/figu
 re-latex/unnamed-chunk-3-1.pdf>]
-<empirical_proj_2_files/figure-latex/unnamed-chunk-5-1.pdf, id=113, 469.755pt x
+<empirical_proj_2_files/figure-latex/unnamed-chunk-5-1.pdf, id=117, 469.755pt x
  325.215pt>
 File: empirical_proj_2_files/figure-latex/unnamed-chunk-5-1.pdf Graphic file (t
 ype pdf)
@@ -738,7 +738,7 @@ Package pdftex.def Info: empirical_proj_2_files/figure-latex/unnamed-chunk-5-1.
 pdf  used on input line 194.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [3 <./empirical_proj_2_files/figure-latex/unnamed-chunk-4-1.pdf>]
-<empirical_proj_2_files/figure-latex/unnamed-chunk-6-1.pdf, id=127, 469.755pt x
+<empirical_proj_2_files/figure-latex/unnamed-chunk-6-1.pdf, id=131, 469.755pt x
  325.215pt>
 File: empirical_proj_2_files/figure-latex/unnamed-chunk-6-1.pdf Graphic file (t
 ype pdf)
@@ -747,7 +747,7 @@ Package pdftex.def Info: empirical_proj_2_files/figure-latex/unnamed-chunk-6-1.
 pdf  used on input line 210.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [4 <./empirical_proj_2_files/figure-latex/unnamed-chunk-5-1.pdf>]
-<empirical_proj_2_files/figure-latex/unnamed-chunk-7-1.pdf, id=138, 469.755pt x
+<empirical_proj_2_files/figure-latex/unnamed-chunk-7-1.pdf, id=142, 469.755pt x
  325.215pt>
 File: empirical_proj_2_files/figure-latex/unnamed-chunk-7-1.pdf Graphic file (t
 ype pdf)
@@ -756,7 +756,7 @@ Package pdftex.def Info: empirical_proj_2_files/figure-latex/unnamed-chunk-7-1.
 pdf  used on input line 222.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [5 <./empirical_proj_2_files/figure-latex/unnamed-chunk-6-1.pdf>]
-<empirical_proj_2_files/figure-latex/unnamed-chunk-7-2.pdf, id=150, 469.755pt x
+<empirical_proj_2_files/figure-latex/unnamed-chunk-7-2.pdf, id=154, 469.755pt x
  325.215pt>
 File: empirical_proj_2_files/figure-latex/unnamed-chunk-7-2.pdf Graphic file (t
 ype pdf)
@@ -765,7 +765,7 @@ Package pdftex.def Info: empirical_proj_2_files/figure-latex/unnamed-chunk-7-2.
 pdf  used on input line 228.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
 [6 <./empirical_proj_2_files/figure-latex/unnamed-chunk-7-1.pdf>]
-<empirical_proj_2_files/figure-latex/unnamed-chunk-8-1.pdf, id=161, 469.755pt x
+<empirical_proj_2_files/figure-latex/unnamed-chunk-8-1.pdf, id=165, 469.755pt x
  325.215pt>
 File: empirical_proj_2_files/figure-latex/unnamed-chunk-8-1.pdf Graphic file (t
 ype pdf)
@@ -786,7 +786,7 @@ l.334 \newpage
                                                   
 l.349 \newpage
               ]
-<empirical_proj_2_files/figure-latex/unnamed-chunk-12-1.pdf, id=203, 469.755pt 
+<empirical_proj_2_files/figure-latex/unnamed-chunk-12-1.pdf, id=207, 469.755pt 
 x 325.215pt>
 File: empirical_proj_2_files/figure-latex/unnamed-chunk-12-1.pdf Graphic file (
 type pdf)
@@ -794,7 +794,7 @@ type pdf)
 Package pdftex.def Info: empirical_proj_2_files/figure-latex/unnamed-chunk-12-1
 .pdf  used on input line 358.
 (pdftex.def)             Requested size: 469.75386pt x 325.2142pt.
-<empirical_proj_2_files/figure-latex/unnamed-chunk-12-2.pdf, id=204, 469.755pt 
+<empirical_proj_2_files/figure-latex/unnamed-chunk-12-2.pdf, id=208, 469.755pt 
 x 325.215pt>
 File: empirical_proj_2_files/figure-latex/unnamed-chunk-12-2.pdf Graphic file (
 type pdf)
@@ -808,19 +808,19 @@ rical_proj_2_files/figure-latex/unnamed-chunk-12-2.pdf>] [13pdfTeX warning (ext
  duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   
-l.415 \end{document}
+l.436 \end{document}
                     ] (./empirical_proj_2.aux)
 
 LaTeX Warning: There were multiply-defined labels.
 
 Package rerunfilecheck Info: File `empirical_proj_2.out' has not changed.
-(rerunfilecheck)             Checksum: 4077444A0805ED34EED9EFAE4BE83CC6;2041.
+(rerunfilecheck)             Checksum: 5A59F27710B2C28297B7E2384FCB3F0C;2145.
  ) 
 Here is how much of TeX's memory you used:
- 11628 strings out of 480954
- 172786 string characters out of 5905761
- 480927 words of memory out of 5000000
- 28549 multiletter control sequences out of 15000+600000
+ 11632 strings out of 480954
+ 172834 string characters out of 5905761
+ 480963 words of memory out of 5000000
+ 28551 multiletter control sequences out of 15000+600000
  447771 words of font info for 67 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  71i,11n,74p,250b,361s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -842,10 +842,10 @@ greenhill/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/l
 indseygreenhill/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb></Us
 ers/lindseygreenhill/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pf
 b>
-Output written on empirical_proj_2.pdf (13 pages, 289315 bytes).
+Output written on empirical_proj_2.pdf (13 pages, 290041 bytes).
 PDF statistics:
- 289 PDF objects out of 1000 (max. 8388607)
- 242 compressed objects within 3 object streams
- 58 named destinations out of 1000 (max. 500000)
- 206 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 294 PDF objects out of 1000 (max. 8388607)
+ 247 compressed objects within 3 object streams
+ 60 named destinations out of 1000 (max. 500000)
+ 214 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -485,6 +485,41 @@ stargazer(mod_class_size15,
 ```
 
 
+\newpage
+
+## Question 16
+
+The standard error is smaller in this model (both the class size and the test
+score mdoel than the previous model (the one limited to the first cutoff point),
+meaning that this model gives us more precise estimates than the model just
+including the 41 student enrollment cutoff.
+
+- The 95% CI for above_cut variable in the class size model is [-15.6, -12.79].
+Because this interval does not contain 0, the can conclude the estimate is
+statistically siignificant from 0 at the 95% confidence level.
+
+- The 95% CI for above_cut variable in the test score model is [-.106, .09].
+Because this interval contains 0, the can conclude the estimate is not
+statistically siignificant from 0 at the 95% confidence level.
+
+
+```{r echo=FALSE}
+
+# class size
+
+cs_test15 <- coeftest(mod_class_size15, vcov = vcovHC(mod_class_size15, type="HC1")) 
+
+lb_cs15 <- -14.2 - (1.96*.715)
+ub_cs15 <- -14.2 + (1.96*.715)
+
+# test score
+
+ts_test15 <- coeftest(mod_test_score15, vcov = vcovHC(mod_test_score15, type="HC1")) 
+
+lb_ts15 <- -.008 - (1.96*.05)
+ub_ts15 <- -.008 + (1.96*.05)
+
+```
 
 
 
