@@ -286,11 +286,14 @@ different in this way.
 ```{r echo=FALSE, message=FALSE}
 
 # aggregating data by school
+
 schools <- data %>%
   group_by(schlcode) %>%
   summarise(enrollment = mean(school_enrollment),
             avg_class_size = mean(class_size, na.rm = T),
             avg_test_score_index = mean(test_score_index, na.rm = T))
+
+# creating histogram
 
 schools %>%
   ggplot(aes(x = enrollment),
@@ -489,10 +492,11 @@ stargazer(mod_class_size15,
 
 ## Question 16
 
-The standard error is smaller in this model (both the class size and the test
-score mdoel than the previous model (the one limited to the first cutoff point),
-meaning that this model gives us more precise estimates than the model just
-including the 41 student enrollment cutoff.
+The standard error (and thus width of the confidence interval) is smaller in
+this model (both the class size and the test score model than the previous model
+(the one limited to the first cutoff point), meaning that this model gives us
+more precise estimates than the model just including the 41 student enrollment
+cutoff.
 
 - The 95% CI for above_cut variable in the class size model is [-15.6, -12.79].
 Because this interval does not contain 0, the can conclude the estimate is
@@ -519,7 +523,17 @@ ts_test15 <- coeftest(mod_test_score15, vcov = vcovHC(mod_test_score15, type="HC
 lb_ts15 <- -.008 - (1.96*.05)
 ub_ts15 <- -.008 + (1.96*.05)
 
+
 ```
+
+## Question 17
+
+Abstract
+
+
+
+
+
 
 
 
