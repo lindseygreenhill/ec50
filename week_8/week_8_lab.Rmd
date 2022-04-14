@@ -1,0 +1,59 @@
+---
+title: "week_8"
+author: "Lindsey Greenhill"
+date: "4/14/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# for scientific notation
+
+options(scipen = 999)
+library(haven)
+library(randomForest)
+library(tidyverse)
+
+
+#Open stata data set
+
+dat <- read_dta("health.dta")
+
+
+```
+
+## Question 1
+
+```{r echo=FALSE}
+#Store health variables from time t-1 which all end with _tm
+all_predictors <- colnames(dat[,grep("^[tm1]", names(dat))])
+
+#Store predictor variables which all start with P_*, but EXCLUDE race
+race <- c("tm1_dem_black")
+exclude_race <- setdiff(all_predictors,race)
+
+#Define training and test data sets
+#Use a uniformly distributed random number between 0 and 1
+dat$random_number <- runif(length(dat$patient_id))
+
+## Generate a training flag for 10% of the sample
+dat$train_flag <- ifelse(dat$random_number<= 0.1, 1, 0) 
+
+#Report number of observations in training and test samples
+n_train <- sum(dat$train_flag)
+n_test <- sum(1-dat$train_flag)
+
+## Create some data frames that just contain the training and test data
+
+#Data frame with training data (randomly selected 10% of the data)
+training <- subset(dat, train_flag == 1)
+# summary(training)
+
+#Data frame with test data (remaining 90% of the data)
+test <- subset(dat, train_flag == 0)
+# summary(test)
+```
+
+I split the data into a training and test group. There are `r n_train`
+observations in the training group and `r n_test` in the test group.
