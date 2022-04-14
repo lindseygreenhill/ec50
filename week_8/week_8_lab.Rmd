@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 options(scipen = 999)
 library(haven)
+library(gt)
 library(randomForest)
 library(tidyverse)
 
@@ -19,6 +20,9 @@ library(tidyverse)
 #Open stata data set
 
 dat <- read_dta("health.dta")
+
+HUID <- 31305187 #Replace with your HUID
+set.seed(HUID)
 
 
 ```
@@ -57,3 +61,370 @@ test <- subset(dat, train_flag == 0)
 
 I split the data into a training and test group. There are `r n_train`
 observations in the training group and `r n_test` in the test group.
+
+## Question 2 CHANGE THE NTREES BACK TO 100
+
+```{r echo=FALSE}
+
+#-------------------------------------------------------------------------------
+# Model 1: Random forest trained to predict costs, using all predictors, 
+# EXCLUDING patient's race 
+#-------------------------------------------------------------------------------
+
+#Reformulate allows us to write yvar ~ xvar1 + xvar2 + ... using a list of all
+#the variables without writing them out
+mod1 <- randomForest(reformulate(exclude_race, "cost_t"), 
+                     ntree=10, 
+                     mtry=149,
+                     importance=TRUE, ## add importance=TRUE so that we store the variable importance information
+                     data=training)
+
+#Tuning parameters are ntree and mtry
+#ntree is number of trees in your forest
+#mtry is the number of predictors considered at each split (default is number of predictors divided by 3)
+
+### Try changing mtry and ntree
+
+# mod1 #Review the Random Forest Results
+
+### generate predictions for all observations in test and training samples
+y_test_predictions_mod1 <- predict(mod1, newdata=test)
+y_train_predictions_mod1 <- predict(mod1, newdata=training)
+
+#Variable importance
+#importance(mod1)
+varImpPlot(mod1, type=1) #Plot the Random Forest Results
+# dev.copy(png,'mod1_importance.png')
+# dev.off()
+
+#type	is either 1 or 2, specifying the type of importance measure 
+#(1=mean decrease in accuracy, 2=mean decrease in node impurity)
+
+
+
+
+#-------------------------------------------------------------------------------
+# Model 2: Random forest trained to predict costs, using all predictors, 
+# INCLUDING patient's race 
+#-------------------------------------------------------------------------------
+
+#Reformulate allows us to write yvar ~ xvar1 + xvar2 + ... using a list of all
+#the variables without writing them out
+mod2 <- randomForest(reformulate(all_predictors, "cost_t"), 
+                     ntree=10, 
+                     mtry=150,
+                     importance=TRUE, ## add importance=TRUE so that we store the variable importance information
+                     data=training)
+
+#Tuning parameters are ntree and mtry
+#ntree is number of trees in your forest
+#mtry is the number of predictors considered at each split (default is number of predictors divided by 3)
+
+### Try changing mtry and ntree
+
+# mod2 #Review the Random Forest Results
+
+### generate predictions for all observations in test and training samples
+y_train_predictions_mod2 <- predict(mod2, newdata=training)
+y_test_predictions_mod2 <- predict(mod2, newdata=test)
+
+#Variable importance
+# importance(mod2)
+varImpPlot(mod2, type=1) #Plot the Random Forest Results
+# dev.copy(png,'mod2_importance.png')
+# dev.off()
+
+
+#type	is either 1 or 2, specifying the type of importance measure 
+#(1=mean decrease in accuracy, 2=mean decrease in node impurity)
+
+#-------------------------------------------------------------------------------
+# Model 3: Random forest trained to predict health, using all predictors, 
+# EXCLUDING patient's race 
+#-------------------------------------------------------------------------------
+
+#Reformulate allows us to write yvar ~ xvar1 + xvar2 + ... using a list of all
+#the variables without writing them out
+mod3 <- randomForest(reformulate(exclude_race, "gagne_sum_t"), 
+                        ntree=10, 
+                        mtry=149,
+                        importance=TRUE, ## add importance=TRUE so that we store the variable importance information
+                        data=training)
+
+#Tuning parameters are ntree and mtry
+#ntree is number of trees in your forest
+#mtry is the number of predictors considered at each split (default is number of predictors divided by 3)
+
+### Try changing mtry and ntree
+
+# mod3 #Review the Random Forest Results
+
+### generate predictions for all observations in test and training samples
+y_test_predictions_mod3 <- predict(mod3, newdata=test)
+y_train_predictions_mod3 <- predict(mod3, newdata=training)
+
+
+#Variable importance
+# importance(mod3)
+varImpPlot(mod3, type=1) #Plot the Random Forest Results
+# dev.copy(png,'mod3_importance.png')
+# dev.off()
+
+#type	is either 1 or 2, specifying the type of importance measure 
+#(1=mean decrease in accuracy, 2=mean decrease in node impurity)
+
+#-------------------------------------------------------------------------------
+# Model 4: Random forest trained to predict health, using all predictors, 
+# INCLUDING patient's race 
+#-------------------------------------------------------------------------------
+
+#Reformulate allows us to write yvar ~ xvar1 + xvar2 + ... using a list of all
+#the variables without writing them out
+mod4 <- randomForest(reformulate(all_predictors, "gagne_sum_t"), 
+                     ntree=10, 
+                     mtry=150,
+                     importance=TRUE, ## add importance=TRUE so that we store the variable importance information
+                     data=training)
+
+#Tuning parameters are ntree and mtry
+#ntree is number of trees in your forest
+#mtry is the number of predictors considered at each split (default is number of predictors divided by 3)
+
+### Try changing mtry and ntree
+
+# mod4 #Review the Random Forest Results
+
+### generate predictions for all observations in test and training samples
+y_train_predictions_mod4 <- predict(mod4, newdata=training)
+y_test_predictions_mod4 <- predict(mod4, newdata=test)
+
+#Variable importance
+# importance(mod4)
+varImpPlot(mod4, type=1) #Plot the Random Forest Results
+# dev.copy(png,'mod4_importance.png')
+# dev.off()
+
+
+#type	is either 1 or 2, specifying the type of importance measure 
+#(1=mean decrease in accuracy, 2=mean decrease in node impurity)
+
+
+
+```
+
+## Question 3 (Training Data)
+
+- The RMSPE is higher for the model that excludes race for both the cost models
+and the health models
+
+
+```{r echo=FALSE}
+#-------------------------------------------------------------------------------
+# Calculate and compare the mean squared error in the training sample: 
+#-------------------------------------------------------------------------------
+
+## Root mean squared prediction error in  the training sample.
+p <- 4
+RMSPE <- matrix(0, p, 1)
+
+## Model 1
+RMSPE[1] <- sqrt(mean((training$cost_t - y_train_predictions_mod1)^2, na.rm=TRUE))
+
+## Model 2
+RMSPE[2] <- sqrt(mean((training$cost_t - y_train_predictions_mod2)^2, na.rm=TRUE))
+
+## Model 3 
+RMSPE[3] <- sqrt(mean((training$gagne_sum_t - y_train_predictions_mod3)^2, na.rm=TRUE))
+
+## Model 4
+RMSPE[4] <- sqrt(mean((training$gagne_sum_t - y_train_predictions_mod4)^2, na.rm=TRUE))
+
+#Display a table of the results
+data.frame(algorithm = c("Model 1 - Costs (excl. race) ", 
+                             "Model 2 - Costs (incl. race) ",
+                             "Model 3 - Health (excl. race)",
+                             "Model 4 - Health (incl. race)"),
+           RMSPE)
+```
+
+## Question 4 (Test Data)
+
+- The RMSPE_OOS is higher for the model that includes race for the cost models
+and is higher for the model that excludes race for the health model
+
+```{r echo=FALSE}
+#-------------------------------------------------------------------------------
+# Calculate and compare the mean squared error in  the lock box data 
+#-------------------------------------------------------------------------------
+
+## Root mean squared prediction error in the test sample.
+p <- 4
+RMSPE_OOS <- matrix(0, p, 1)
+
+## Model 1
+RMSPE_OOS[1] <- sqrt(mean((test$cost_t - y_test_predictions_mod1)^2, na.rm=TRUE))
+
+## Model 2
+RMSPE_OOS[2] <- sqrt(mean((test$cost_t - y_test_predictions_mod2)^2, na.rm=TRUE))
+
+## Model 3
+RMSPE_OOS[3] <- sqrt(mean((test$gagne_sum_t - y_test_predictions_mod3)^2, na.rm=TRUE))
+
+## Model 4
+RMSPE_OOS[4] <- sqrt(mean((test$gagne_sum_t - y_test_predictions_mod4)^2, na.rm=TRUE))
+
+
+#Display a table of the results
+data.frame(algorithm = c("Model 1 - Costs (excl. race) ", 
+                         "Model 2 - Costs (incl. race) ",
+                         "Model 3 - Health (excl. race)",
+                         "Model 4 - Health (incl. race)"),
+           RMSPE_OOS)
+ 
+```
+
+## Question 5
+
+```{r echo=FALSE}
+
+#-------------------------------------------------------------------------------
+# Export test data set with predictions
+#-------------------------------------------------------------------------------
+
+#Export data set with training data + predictions from the models
+lab8 <- test
+
+lab8$y_test_predictions_mod1 <- y_test_predictions_mod1
+lab8$y_test_predictions_mod2 <- y_test_predictions_mod2
+lab8$y_test_predictions_mod3 <- y_test_predictions_mod3
+lab8$y_test_predictions_mod4 <- y_test_predictions_mod4
+
+write_dta(lab8, "lab8_results.dta")
+
+```
+
+## Question 6
+
+I calculated percentile ranks for each of the 4 model predictions
+
+```{r echo=FALSE}
+
+# from lab 1
+
+percentile_rank <- function(variable){ 
+  
+  #Convert to ranks, taking care of potential missing values 
+  r <- ifelse(is.na(variable), NA, rank(variable, ties.method = "average")) 
+  
+  #Return percentile rank = rank normalized so max is 100 
+  100*r/max(r, na.rm = T) 
+} 
+
+# applying function
+
+lab8$mod1_rank <-with(lab8, percentile_rank(y_test_predictions_mod1)) 
+lab8$mod2_rank <-with(lab8, percentile_rank(y_test_predictions_mod2)) 
+lab8$mod3_rank <-with(lab8, percentile_rank(y_test_predictions_mod3)) 
+lab8$mod4_rank <-with(lab8, percentile_rank(y_test_predictions_mod4)) 
+
+
+```
+
+## Question 7
+
+### Part a
+
+```{r echo=FALSE}
+
+lab8_7a <- lab8 %>%
+  filter(race == "black")
+
+# mod 1
+
+mod1_7a <- lab8_7a %>%
+  mutate(qualify = if_else(mod1_rank > 55, 1, 0)) %>%
+  summarise(fraction = mean(qualify)) %>%
+  as.numeric()
+
+# mod 2
+
+mod2_7a <- lab8_7a %>%
+  mutate(qualify = if_else(mod2_rank > 55, 1, 0)) %>%
+  summarise(fraction = mean(qualify)) %>%
+  as.numeric()
+
+# mod 3
+
+mod3_7a <- lab8_7a %>%
+  mutate(qualify = if_else(mod3_rank > 55, 1, 0)) %>%
+  summarise(fraction = mean(qualify)) %>%
+  as.numeric()
+
+# mod 4
+
+mod4_7a <- lab8_7a %>%
+  mutate(qualify = if_else(mod4_rank > 55, 1, 0)) %>%
+  summarise(fraction = mean(qualify)) %>%
+  as.numeric()
+
+table_7a <- tibble(model = c("mod1",
+                          "mod2",
+                          "mod3",
+                          "mod4"),
+                fraction_qualify = c(mod1_7a,
+                                     mod2_7a,
+                                     mod3_7a,
+                                     mod4_7a))
+
+gt(table_7a)
+
+
+```
+
+### Part b
+
+```{r echo=FALSE}
+
+# first filtering to people who qualify and then counting which fraction is
+# black
+
+mod1_7b <- lab8 %>%
+  filter(mod1_rank > 55) %>%
+  mutate(black = if_else(race == "black", 1, 0)) %>%
+  summarise(fraction = mean(black)) %>%
+  as.numeric()
+
+mod2_7b <- lab8 %>%
+  filter(mod2_rank > 55) %>%
+  mutate(black = if_else(race == "black", 1, 0)) %>%
+  summarise(fraction = mean(black)) %>%
+  as.numeric()
+
+mod3_7b <- lab8 %>%
+  filter(mod3_rank > 55) %>%
+  mutate(black = if_else(race == "black", 1, 0)) %>%
+  summarise(fraction = mean(black)) %>%
+  as.numeric()
+
+mod4_7b <- lab8 %>%
+  filter(mod4_rank > 55) %>%
+  mutate(black = if_else(race == "black", 1, 0)) %>%
+  summarise(fraction = mean(black)) %>%
+  as.numeric()
+
+# presenting results in table
+
+table_7b <- tibble(model = c("mod1",
+                          "mod2",
+                          "mod3",
+                          "mod4"),
+                fraction_black = c(mod1_7b,
+                                     mod2_7b,
+                                     mod3_7b,
+                                     mod4_7b))
+
+gt(table_7b)
+
+```
+
+
