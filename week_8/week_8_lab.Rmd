@@ -13,6 +13,8 @@ knitr::opts_chunk$set(echo = TRUE)
 options(scipen = 999)
 library(haven)
 library(gt)
+library(statar)
+library(ggpubr)
 library(randomForest)
 library(tidyverse)
 
@@ -62,7 +64,7 @@ test <- subset(dat, train_flag == 0)
 I split the data into a training and test group. There are `r n_train`
 observations in the training group and `r n_test` in the test group.
 
-## Question 2 CHANGE THE NTREES BACK TO 100
+## Question 2 
 
 ```{r echo=FALSE}
 
@@ -74,7 +76,7 @@ observations in the training group and `r n_test` in the test group.
 #Reformulate allows us to write yvar ~ xvar1 + xvar2 + ... using a list of all
 #the variables without writing them out
 mod1 <- randomForest(reformulate(exclude_race, "cost_t"), 
-                     ntree=10, 
+                     ntree=100, 
                      mtry=149,
                      importance=TRUE, ## add importance=TRUE so that we store the variable importance information
                      data=training)
@@ -111,7 +113,7 @@ varImpPlot(mod1, type=1) #Plot the Random Forest Results
 #Reformulate allows us to write yvar ~ xvar1 + xvar2 + ... using a list of all
 #the variables without writing them out
 mod2 <- randomForest(reformulate(all_predictors, "cost_t"), 
-                     ntree=10, 
+                     ntree=100, 
                      mtry=150,
                      importance=TRUE, ## add importance=TRUE so that we store the variable importance information
                      data=training)
@@ -146,7 +148,7 @@ varImpPlot(mod2, type=1) #Plot the Random Forest Results
 #Reformulate allows us to write yvar ~ xvar1 + xvar2 + ... using a list of all
 #the variables without writing them out
 mod3 <- randomForest(reformulate(exclude_race, "gagne_sum_t"), 
-                        ntree=10, 
+                        ntree=100, 
                         mtry=149,
                         importance=TRUE, ## add importance=TRUE so that we store the variable importance information
                         data=training)
@@ -181,7 +183,7 @@ varImpPlot(mod3, type=1) #Plot the Random Forest Results
 #Reformulate allows us to write yvar ~ xvar1 + xvar2 + ... using a list of all
 #the variables without writing them out
 mod4 <- randomForest(reformulate(all_predictors, "gagne_sum_t"), 
-                     ntree=10, 
+                     ntree=100, 
                      mtry=150,
                      importance=TRUE, ## add importance=TRUE so that we store the variable importance information
                      data=training)
@@ -426,5 +428,62 @@ table_7b <- tibble(model = c("mod1",
 gt(table_7b)
 
 ```
+
+## Question 8
+
+```{r echo=FALSE}
+
+# doing the graphs by race
+
+mod1_8 <- lab8 %>%
+  ggplot(aes(x = mod1_rank, y = cost_t, color = race)) +
+  stat_binmean(n = 20, geom = "line") +
+  stat_binmean(n = 20, geom = "point") +
+  labs(title = "Model 1") +
+  theme_classic()
+
+mod2_8 <- lab8 %>%
+  ggplot(aes(x = mod2_rank, y = cost_t, color = race)) +
+  stat_binmean(n = 20, geom = "line") +
+  stat_binmean(n = 20, geom = "point") +
+  labs(title = "Model 2") +
+  theme_classic()
+
+mod3_8 <- lab8 %>%
+  ggplot(aes(x = mod3_rank, y = gagne_sum_t, color = race)) +
+  stat_binmean(n = 20, geom = "line") +
+  stat_binmean(n = 20, geom = "point") +
+  labs(title = "Model 3") +
+  theme_classic()
+
+mod4_8 <- lab8 %>%
+  ggplot(aes(x = mod4_rank, y = gagne_sum_t, color = race)) +
+  stat_binmean(n = 20, geom = "line") +
+  stat_binmean(n = 20, geom = "point") +
+  labs(title = "Model 4") +
+  theme_classic()
+
+mod1_8
+mod2_8
+mod3_8
+mod4_8
+
+
+```
+
+## Question 9
+
+Professor Obermeyer was referring to the fact that this algorithm was trained to
+predict health cost as the dependent variable, or "label." The algorithm
+designers used cost as a proxy for health needs for patients. However, it turns
+out that using cost as a proxy for need leads to biased results. As we can see
+in the graphs above, the models that predict gagne_sum_t (total number of active
+chronic illnesses) is biased against black patients, meaning that it predicts a
+lower risk score for black patients with the same health as white patients. This
+happens because, as just discussed, the model was trained to predict cost. As we
+can see, the model pretty accurately predicts cost for both black and white
+patients. However, for a variety of reasons, the costs for black patients are
+often lower than the cost for white patients. As such,the model underestimates
+the needs of black patients relative to white patients.
 
 
