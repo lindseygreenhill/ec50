@@ -14,6 +14,7 @@ library(statar)
 library(lmtest)
 library(sandwich)
 library(Synth)
+library(stargazer)
 library(gt)
 library(SCtools)
 cig <- read_dta("ec50_smoking.dta")
@@ -149,5 +150,55 @@ q3_table <- tibble(group = c("Alabama", "Rest of U.S."),
 
 q3_table %>%
   gt()
+```
+## Question 4
+
+The coefficient for dd (11.11) is the same as what I calculated above. 
+
+\newpage
+
+```{r echo=FALSE, results = "asis"}
+
+q4_df <- cig %>%
+  filter(year >=2011)
+
+q4_df$post <- 0
+q4_df$post[which(q4_df$year >= 2016)] <- 1
+
+#Generate interaction term
+q4_df$dd <- q4_df$al*q4_df$post
+
+#Subset to years you want
+#cig_narrow2 only includes the years right around the policy change
+q4_df_2 <- subset(q4_df, year>= 2015 & year <= 2017)
+
+#Estimate simple differences in differences
+reg1 <- lm(pack_sales ~ post + al + dd, data=q4_df)
+
+stargazer(reg1,
+          type = "latex")
+
+#Report heteroskedasticity robust standard errors
+coeftest(reg1, vcov = vcovHC(reg1, type="HC1"))
+```
+
+\newpage
+
+## Question 5
+
+The difference in difference estimate is -1.11. This implies that Alabama's tax
+policy resulted on average in a 1.11 unit decrease in cigarette consumption,
+holding all else constant.
+
+```{r echo=FALSE}
+#What if we use more years? cig_narrow includes the 1987-2000
+#Estimate difference in difference regression extended to multiple control states and many years
+#factor(year) generates a fixed effect for each year, excluding one as the reference level
+
+#factor(state) generates a fixed effect for each state, excluding one as the reference level
+
+reg2 <- lm(pack_sales ~ dd + factor(year) + factor(state_fips), 
+           data=q4_df)
+coeftest(reg2, vcov = vcovHC(reg2, type="HC1"))
 ```
 
