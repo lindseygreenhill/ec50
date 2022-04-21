@@ -202,3 +202,145 @@ reg2 <- lm(pack_sales ~ dd + factor(year) + factor(state_fips),
 coeftest(reg2, vcov = vcovHC(reg2, type="HC1"))
 ```
 
+## Question 6
+
+### Part a
+
+GA, MO, and WV receive the most weight. 
+
+```{r echo=FALSE}
+
+#Data prep
+#Natural log of state income per capita
+cig$lnincome <- log(cig$personal_income)
+
+
+#Restrict to CA and 38 states that did not have other policy changes
+policy <- subset(cig, sample == 1)
+
+
+
+#-------------------------------------------------------------------------------
+# Graphical analyses
+#-------------------------------------------------------------------------------
+
+
+#Subset data to particular time range
+q6 <- subset(policy, year >= 2006)
+
+#Replicate figure 1
+ggplot(q6, aes(x=year,y=pack_sales, 
+                       shape= factor(al, labels = c("Rest of U.S.", "Alabama")))) +
+  geom_vline(xintercept=2016) +
+  stat_summary(fun.y = "mean",geom="point") +
+  stat_summary(fun.y = "mean",geom="line")  +
+  labs(x = "Year", y = "Cigarette Consumption", shape = "",
+       title = "Alabama vs. Rest of U.S. 2006-2018") +
+  theme(legend.position="bottom") +
+  theme_classic()
+
+
+
+#-------------------------------------------------------------------------------
+# Synthetic control: Estimation
+#-------------------------------------------------------------------------------
+
+#This example follows: 
+
+#https://www.rdocumentation.org/packages/Synth/versions/1.1-5/topics/synth
+#https://www.rdocumentation.org/packages/Synth/versions/1.1-5/topics/dataprep
+
+
+#https://rpubs.com/danilofreire/synth
+
+
+#Store FIPS code for treated state
+treated_state <- 1 #This is California in the example
+
+# Make a list of control states' fips codes, excluding treated state
+
+#Start with a list of all unique FIPS codes
+list_state <- unique(policy$state_fips)
+
+#Now remove the treated state's FIPS code from the list
+list_state <- list_state[list_state != treated_state]
+
+# I'm using wine, age14to24, and cost per pack 
+# create matrices from panel data that provide inputs for synth()
+policy <- as.data.frame(policy)
+
+dataprep.out<-
+  dataprep(
+    foo = policy,
+    predictors = c("wine", "age15to24", "cost_per_pack"),
+    predictors.op = "mean",
+    dependent = "pack_sales",
+    unit.variable = "state_fips",
+    time.variable = "year",
+    special.predictors = list(
+      list("pack_sales", 2009, "mean"),
+      list("pack_sales", 2014, "mean"),
+      list("pack_sales", 2016, "mean")
+    ),
+    treatment.identifier = treated_state,
+    controls.identifier = list_state,
+    time.predictors.prior = c(2006:2016),
+    time.optimize.ssr = c(2006:2016),
+    unit.names.variable = "state",
+    time.plot = 2006:2018
+  )
+
+## run the synth command to identify the weights
+## that create the best possible synthetic 
+## control unit for the treated.
+synth.out <- synth(dataprep.out)
+
+## there are two ways to summarize the results
+## we can either access the output from synth.out directly
+round(synth.out$solution.w,2)
+# contains the unit weights  
+
+## the output from synth opt 
+## can be flexibly combined with 
+## the output from dataprep to 
+## compute other quantities of interest
+## for example, the period by period 
+## discrepancies between the 
+## treated unit and its synthetic control unit
+## can be computed by typing
+gaps<- dataprep.out$Y1plot-(
+  dataprep.out$Y0plot%*%synth.out$solution.w
+) ; gaps
+
+## also there are three convenience functions to summarize results.
+## to get summary tables for all information 
+## (V and W weights plus balance btw. 
+## treated and synthetic control) use the 
+## synth.tab() command
+synth.tables <- synth.tab(
+  dataprep.res = dataprep.out,
+  synth.res = synth.out)
+print(synth.tables)
+
+## to get summary plots for outcome trajectories 
+## of the treated and the synthetic control unit use the 
+## path.plot() and the gaps.plot() commands
+
+## plot in levels (treated and synthetic)
+path.plot(dataprep.res = dataprep.out,synth.res = synth.out, tr.intake = 1989)
+#dev.copy(png,'prop99_graph1.png')
+#dev.off()
+
+## plot the gaps (treated - synthetic)
+gaps.plot(dataprep.res = dataprep.out,synth.res = synth.out, tr.intake = 1989)
+#dev.copy(png,'prop99_graph2.png')
+#dev.off()
+
+```
+
+## Part b
+
+```{r}
+
+```
+
