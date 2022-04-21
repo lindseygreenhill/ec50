@@ -1,0 +1,153 @@
+---
+title: "lab_9"
+author: "Lindsey Greenhill"
+date: "4/21/2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(haven)
+library(statar)
+library(lmtest)
+library(sandwich)
+library(Synth)
+library(gt)
+library(SCtools)
+cig <- read_dta("ec50_smoking.dta")
+
+```
+
+## Question 1
+
+I look at Alabama in this graph. There were tax hikes in 1981, 2004, and 2016.
+The largest of these hikes occured in 2004, when the tax rose from .165 in 2003
+to .425 in 2004. The hike in 2015 was almost as large: the tax from from .425 in
+2015 to .675 in 2016.
+
+```{r echo=FALSE}
+# I am looking at Alabama
+
+cig %>%
+  filter(state_fips == 1,
+         year >=1970, year <= 2018) %>%
+  ggplot(aes(x = year, y = state_tax_dollars)) +
+  geom_point() +
+  geom_line() +
+  labs(title = "AL State Cigarette Tax Per Pack",
+       subtitle = "1970 - 2018",
+       y = "state cigarette tax per pack") +
+  theme_classic()
+
+# from this graph, it seems like there hve been many tax policy changes in CT
+# since 2000. It looks like the largest of these jumps happened from 209 to
+# 2010, when the state tax rose from $2 to $3
+```
+
+## Question 2
+
+### Part a
+
+```{r echo=FALSE}
+
+cig$al <- 0
+cig$al[which(cig$state=="AL")] <- 1
+cig_narrow <- subset(cig, year>=2006 & year <= 2018)
+
+#Replicate figure 1
+
+ggplot(cig_narrow, aes(x=year,y=pack_sales,
+                       shape= factor(al, labels = c("Rest of U.S.", "Alabama")))) +
+  geom_vline(xintercept=2016) +
+  stat_summary(fun = "mean",geom="point") +
+  stat_summary(fun = "mean",geom="line")  +
+  labs(x = "Year", y = "Cigarette Consumption", shape = "") +
+  theme(legend.position="bottom") +
+  labs(title = "Alabama vs. Rest of US") +
+  theme_classic()
+```
+
+### Part b
+
+```{r echo=FALSE}
+
+#Compare Alabama to only neighboring states
+# GA, FL, TN, and MS
+cig_narrow <- subset(cig_narrow, state == "AL" 
+                     | state == "GA" 
+                     | state == "FL" 
+                     | state == "MS" 
+                     | state == "TN")
+
+
+#Replicate figure 2
+ggplot(cig_narrow, 
+       aes(x=year,y=pack_sales, 
+           shape = factor(al, labels = c("Surrounding States", "Alabama")))) +
+  geom_vline(xintercept=2016) +
+  stat_summary(fun = "mean",geom="point") +
+  stat_summary(fun = "mean",geom="line")  +
+  labs(x = "Year", y = "Cigarette Consumption", shape = "") +
+  theme(legend.position="bottom") +
+  labs(title = "Alabama vs. Neighboring States") +
+  theme_classic()
+
+```
+
+### Part c
+
+The parallel trends assumption looks plausible for part a, but the the trends in
+the surrounding states look like they have some strange spikes that Alabama
+doesn't have.
+
+## Question 3
+
+Based on the previous question, I am going to use the entirety of the US as my
+control group. See the table below for the statistics on the effect of the 2016
+tax hike in Alabama vs. the Rest of the U.S.. Using the difference in
+differences calculation, I calculate that the impact of the ccigarette tax
+policy change = 6.88 - 5.77 = 1.11. In context, this implies that the 2016
+policy results in a decrease of 1.11 in consumption in Alabama.
+
+```{r echo=FALSE}
+
+# calculating stats
+
+q3_prev_5 <- cig %>%
+  filter(year >=2011, year < 2016)
+q3_after <- cig %>%
+  filter(year >= 2016)
+
+stat_1 <- q3_prev_5 %>% 
+  filter(state == "AL") %>%
+  summarise(mean_cig_consumption = mean(pack_sales, na.rm = T)) %>%
+  as.numeric()
+
+stat_2 <- q3_after %>% 
+  filter(state == "AL") %>%
+  summarise(mean_cig_consumption = mean(pack_sales, na.rm = T)) %>%
+  as.numeric()
+
+stat_3 <- q3_prev_5 %>% 
+  filter(state != "AL") %>%
+  summarise(mean_cig_consumption = mean(pack_sales, na.rm = T)) %>%
+  as.numeric()
+
+stat_4 <- q3_after %>% 
+  filter(state != "AL") %>%
+  summarise(mean_cig_consumption = mean(pack_sales, na.rm = T)) %>%
+  as.numeric()
+
+# creating new table
+
+q3_table <- tibble(group = c("Alabama", "Rest of U.S."),
+                   mean_consumption_before_2016 = c(stat_1, stat_3),
+                   mean_consumption_after_2016 = c(stat_2, stat_4),
+                   difference = mean_consumption_before_2016 - mean_consumption_after_2016)
+
+q3_table %>%
+  gt()
+```
+
