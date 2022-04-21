@@ -190,6 +190,9 @@ The difference in difference estimate is -1.11. This implies that Alabama's tax
 policy resulted on average in a 1.11 unit decrease in cigarette consumption,
 holding all else constant.
 
+
+
+
 ```{r echo=FALSE}
 #What if we use more years? cig_narrow includes the 1987-2000
 #Estimate difference in difference regression extended to multiple control states and many years
@@ -204,9 +207,16 @@ coeftest(reg2, vcov = vcovHC(reg2, type="HC1"))
 
 ## Question 6
 
-### Part a
-
 GA, MO, and WV receive the most weight. 
+
+With regards to the graphs, there seems to be at least a growing of the gap when the 2016 
+tax hike takes place. It is easier to see this gap in this graph than in the graphs from 
+question 2. 
+
+The pvalue = .05, so it could be considered statistically significant. 
+
+\newpage
+
 
 ```{r echo=FALSE}
 
@@ -320,7 +330,7 @@ gaps<- dataprep.out$Y1plot-(
 synth.tables <- synth.tab(
   dataprep.res = dataprep.out,
   synth.res = synth.out)
-print(synth.tables)
+# print(synth.tables)
 
 ## to get summary plots for outcome trajectories 
 ## of the treated and the synthetic control unit use the 
@@ -336,11 +346,19 @@ gaps.plot(dataprep.res = dataprep.out,synth.res = synth.out, tr.intake = 1989)
 #dev.copy(png,'prop99_graph2.png')
 #dev.off()
 
+tdf <- generate.placebos(dataprep.out,synth.out, Sigf.ipop = 2)
+
+## Plot the gaps in outcome values over time of each unit --
+## treated and placebos -- to their synthetic controls
+p <- plot_placebos(tdf,discard.extreme=TRUE, mspe.limit=10, xlab='Year')
+p
+
+
+## Test how extreme was the observed treatment effect given the placebos:
+ratio <- mspe.test(tdf)
+ratio$p.val
+mspe.plot(tdf, discard.extreme = FALSE)
+
 ```
 
-## Part b
-
-```{r}
-
-```
 
