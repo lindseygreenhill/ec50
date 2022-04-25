@@ -314,6 +314,8 @@ possible that there was manipulation in enrollment, but there are conflicting
 behvaviors at the two cutoffs. There doesn't appear to be any spike at the 121
 line.
 
+\newpage
+
 ## Question 11
 
 ```{r echo=FALSE, results="asis"}
@@ -347,6 +349,9 @@ stargazer(mod_classsize, mod_testscore,
 
 
 ```
+
+\newpage
+
 - For the test score model, the estimate of the discontinuity
 at the 41 threshold = .026. 
 
@@ -452,6 +457,7 @@ ts_dc <- rdplot(schools$avg_test_score_index,
 
 ```
 
+\newpage
 
 ## Question 15
 
@@ -528,7 +534,14 @@ ub_ts15 <- -.008 + (1.96*.05)
 
 ## Question 17
 
-Abstract
+It is illegal for schools to have a class size of over 40 students in Israel.
+Assuming the difference between a school with 40 students enrolled and a school
+with 41 students enrolled is as-if random, the variability in class size
+presents an optimal opportunity for quasi-experimental analysis. Using a
+regression discontinuity design, I find that the effect of enrolling 1
+additional student from the 40 (or multiple of 40) cutoff is **not** associated
+with a statistically significant change in test scores. However, I also find
+evidence that schools may manipulate enrollment numbers around the cutoff.
 
 
 
